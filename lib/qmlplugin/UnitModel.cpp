@@ -98,11 +98,11 @@ UnitModel::loadUnit(const QDBusObjectPath &unitPath) {
     Q_D(UnitModel);
     QDBusConnection bus = d->m->connection();
     auto *unit = new Systemd::Unit(bus, QDBusObjectPath(unitPath), this);
-    beginInsertRows(QModelIndex(), d->m_units.size(), d->m_units.size());
-    d->m_units.append(unit);
+    beginInsertRows(QModelIndex(), 0, 1);
+    d->m_units.prepend(unit);
     connect(unit, &Systemd::Unit::changed, this, &UnitModel::unitChanged);
     endInsertRows();
-    d->m_unitNames.append(unit->id());
+    d->m_unitNames.prepend(unit->id());
     emit unitsChanged();
 }
 
