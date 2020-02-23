@@ -115,7 +115,8 @@ UnitModel::loadUnit(const QString &unitName) {
             [this, unitName](const QDBusPendingReply<QDBusObjectPath> &reply, const QDBusObjectPath &path) -> void {
 
                 if (!reply.isValid()) {
-                    qWarning() << "UnitModel::loadUnit(): reply is not valid";
+                    // TODO: remove unit from unitlist. This means the name is invalid, not that the unit is not known.
+                    qWarning() << "UnitModel::loadUnit(" << unitName << "): reply is not valid";
                 }
                 this->loadUnit(path);
             });
