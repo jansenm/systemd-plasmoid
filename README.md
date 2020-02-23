@@ -22,9 +22,22 @@ To test the widget without installing it:
     # the default style currently has a bug
     QT_QUICK_CONTROLS_STYLE="Material" plasmoidviewer --applet ../lib/plasmoid/
 
-## Dependencies
+## Required Dependencies
 
-The widget only depends on the usual kde dependencies.
+
+The following KDE-Frameworks are required
+ * I18n
+ * Notifications
+ * Plasma
+
+The following Qt5 Modules are required
+  * Core
+  * DBus
+  * Quick
+  * Test
+
+And
+  * Extra-CMake-Modules 
 
 ## Authors
 
