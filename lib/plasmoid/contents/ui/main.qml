@@ -29,6 +29,17 @@ import org.kde.systemd 0.1
 
 Item {
 
+    function saveConfiguration() {
+        plasmoid.configuration.units = conn.units.units;
+        plasmoid.configNeedsSaving();
+    }
+
+    function loadConfiguration() {
+        console.log(plasmoid.configuration.units);
+        conn.units.units = plasmoid.configuration.units;
+        conn.unitFiles.unitFilesChanged();
+    }
+
     // TODO: Add something useful here.
     Layout.minimumWidth: 400
     Layout.minimumHeight: 200
@@ -73,8 +84,7 @@ Item {
                 delegate: UnitItem {}
                 Component.onCompleted: {
                     // TODO read this from a configuration file. How to make sure i can add two of these plasmoids with different configurations?
-                    conn.units.units = [ "-.mount", "cups.service", "ddd.mount", "apache2.service" ];
-                    conn.unitFiles.unitFilesChanged();
+                    loadConfiguration();
                 }
             }
         }

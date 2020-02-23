@@ -69,6 +69,7 @@ PlasmaComponents.ToolBar {
                 if (!conn.units.units.includes(unitFileName.currentText)) {
                     conn.units.loadUnit(unitFileName.currentText);
                 }
+                saveConfiguration();
             }
         }
 

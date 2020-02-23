@@ -7,7 +7,7 @@
     <group name="Units">
         <entry name="units" type="StringList">
             <label>Connection Units to monitor</label>
-            <default>-.mount, apache2.service</default>
+            <default>-.mount,apache2.service</default>
         </entry>
     </group>
 </kcfg>
