@@ -1,0 +1,8 @@
+---
+# We'll use defaults from the LLVM style, but with 4 columns indentation.
+  # LLVM, Google, Chromium, Mozilla, WebKit, Microsoft
+BasedOnStyle: Mozilla
+IndentWidth: 4
+---
+Language: Cpp
+BreakBeforeBinaryOperators: NonAssignment

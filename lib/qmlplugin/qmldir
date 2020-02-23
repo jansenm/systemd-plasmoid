@@ -1,0 +1,3 @@
+module org.kde.systemd
+
+plugin org_kde_systemd_qmlplugin

@@ -1,0 +1,4 @@
+# CLion build directories
+cmake-build-*
+*.qmlc
+.envrc
