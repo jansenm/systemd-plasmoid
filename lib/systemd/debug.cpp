@@ -1,4 +1,5 @@
 /*
+ * Systemd KDE - A plasma widget to control systemd services
  * Copyright (C) 2020  Michael Jansen <info@michael-jansen.biz>
  *
  * This program is free software; you can redistribute it and/or modify
