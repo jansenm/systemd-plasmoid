@@ -71,6 +71,16 @@ QVariant UnitFileModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
+bool UnitFileModel::has(const QString &service) const {
+    Q_D(const UnitFileModel);
+    foreach(auto unit, d->m_unitFiles) {
+        if (unit->name() == service) {
+            return true;
+        }
+    }
+    return false;
+}
+
 QHash<int, QByteArray> UnitFileModel::roleNames() const {
     QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
     roles[Roles::Path] = "Path";
@@ -98,8 +108,9 @@ void UnitFileModel::unitFilesChanged() {
                 Q_D(UnitFileModel);
                 if (reply.isValid()) {
                     std::sort(list.begin(), list.end(),
-                              [](Systemd::UnitFile *a, Systemd::UnitFile *b) { return a->name()
-                              < b->name(); });
+                              [](Systemd::UnitFile *a, Systemd::UnitFile *b) {
+                                  return a->name() < b->name();
+                              });
                     beginInsertRows(QModelIndex(), 0, list.size());
                     d->m_unitFiles = list;
                     endInsertRows();

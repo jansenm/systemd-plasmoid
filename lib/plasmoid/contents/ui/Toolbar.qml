@@ -33,22 +33,30 @@ PlasmaComponents.ToolBar {
 
     tools: PlasmaComponents.ToolBarLayout {
 
-        ComboBox {
-            id: unitFileName
-            Layout.fillWidth: true
-            editable: true
-            textRole: "Name"
-            model: conn.unitFiles
+        // TODO This neither works with the default qml platform theme. And the list is to long and the autocompletion
+        //      not really helpfull. We would need some fuzzy html like stuff.
+        // ComboBox {
+        //     id: unitFileName
+        //     Layout.fillWidth: true
+        //     editable: true
+        //     textRole: "Name"
+        //     model: conn.unitFiles
 
-            delegate: ItemDelegate {
+        //     delegate: ItemDelegate {
 
-                contentItem: Column {
-                    Text {
-                        bottomPadding: 1
-                        text: "<b>%1</b><br><small>%2</small>".arg(model.Name).arg(model.State)
-                    }
-                }
-            }
+        //         contentItem: Column {
+        //             Text {
+        //                 bottomPadding: 1
+        //                 text: "<b>%1</b><br><small>%2</small>".arg(model.Name).arg(model.State)
+        //             }
+        //         }
+        //     }
+        // }
+
+        TextField {
+            id: unitName
+            placeholderText: i18n("Add systemd unit");
+            Layout.fillWidth: true;
         }
 
         PlasmaComponents.ToolButton {
@@ -59,15 +67,16 @@ PlasmaComponents.ToolBar {
 
             Binding on enabled {
                 // Enable it when something new is selected
-                when: unitFileName.currentIndex != -1 && !conn.units.units.includes(unitFileName.currentText)
+                // when: unitFileName.currentIndex != -1 &&
+                when: !conn.units.units.includes(unitName.text) && conn.unitFiles.has(unitName.text)
                 value: true
                 restoreMode: Binding.RestoreBindingOrValue
             }
 
             onClicked: {
                 // Play it twice as safe. Make sure the unit isn't already added.
-                if (!conn.units.units.includes(unitFileName.currentText)) {
-                    conn.units.loadUnit(unitFileName.currentText);
+                if (!conn.units.units.includes(unitName.text)) {
+                    conn.units.loadUnit(unitName.text);
                 }
                 saveConfiguration();
             }

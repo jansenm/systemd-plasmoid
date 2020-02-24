@@ -46,6 +46,9 @@ public:
 
     int rowCount(const QModelIndex &parent) const override;
 
+    // Check if the given service exists
+    Q_INVOKABLE bool has(const QString & service) const;
+
 
 public slots:
 
