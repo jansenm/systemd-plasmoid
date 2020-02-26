@@ -47,8 +47,7 @@ UnitModel::UnitModel(Manager *manager, QObject *parent)
 
 UnitModel::~UnitModel() {
     Q_D(UnitModel);
-    qDeleteAll(d->m_units);
-    d->m_units.clear(); // Don't think its really needed.
+    unloadUnits();
     delete d_ptr;
 }
 
@@ -91,6 +90,15 @@ UnitModel::data(const QModelIndex &index, int role) const {
     }
 
     return QVariant();
+}
+
+void UnitModel::unloadUnits() {
+    Q_D(UnitModel);
+    emit beginRemoveColumns(QModelIndex(), 0, d->m_units.size());
+    qDeleteAll(d->m_units);
+    d->m_units.clear();
+    d->m_unitNames.clear();
+    emit endRemoveColumns();
 }
 
 void
@@ -164,7 +172,7 @@ UnitModel::setUnits(const QStringList &unitNames) {
         return;
     }
 
-    d->m_unitNames = unitNames;
+    unloadUnits();
 
     for (const QString &unitName: unitNames) {
         loadUnit(unitName);

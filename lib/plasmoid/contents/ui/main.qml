@@ -19,23 +19,27 @@
  */
 import QtQuick 2.14
 import QtQuick.Layouts 1.14
-//import QtQuick.Controls 2.14
+import QtQuick.Controls 2.14
+import QtQml 2.14
 import org.kde.plasma.plasmoid 2.0
-// import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.extras 2.0 as PlasmaExtra
-// import org.kde.plasma.core 2.0 as PlasmaCore
 
 import org.kde.systemd 0.1
 
 Item {
 
-    function saveConfiguration() {
-        plasmoid.configuration.units = conn.units.units;
+    function configNeedsSaving() {
+        // console.log("Saving for real" + conn.units.units);
         plasmoid.configNeedsSaving();
     }
 
+    function saveConfiguration() {
+        plasmoid.configuration.units = conn.units.units;
+        // First empty the event loop in case there are more changes to the configuration. Then trigger a save
+        Qt.callLater(configNeedsSaving);
+    }
+
     function loadConfiguration() {
-        console.log(plasmoid.configuration.units);
         conn.units.units = plasmoid.configuration.units;
         conn.unitFiles.unitFilesChanged();
     }
@@ -58,19 +62,14 @@ Item {
     //     focus: true
     // }
 
-
-    QMLDebugger {
-        id: qmlDebugger
-    }
-
-    Connection {
-        id: conn
-    }
+    Actions     { id: actions }
+    Connection  { id: conn }
+    QMLDebugger { id: qmlDebugger }
 
     ColumnLayout {
         anchors.fill: parent
 
-        Toolbar { }
+        Toolbar { id: toolbar }
 
         // Or should we use PlasmaExtra.ScrollArea here? So Confusing.
         PlasmaExtra.ScrollArea {
@@ -83,11 +82,10 @@ Item {
                 model: conn.units
                 delegate: UnitItem {}
                 Component.onCompleted: {
-                    // TODO read this from a configuration file. How to make sure i can add two of these plasmoids with different configurations?
                     loadConfiguration();
+                    conn.units.onUnitsChanged.connect(saveConfiguration);
                 }
             }
         }
     }
-
 }

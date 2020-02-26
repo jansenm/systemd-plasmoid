@@ -28,7 +28,8 @@ import org.kde.systemd 0.1
 
 PlasmaComponents.ToolBar {
 
-    id: toolbar
+    property string unitName: unitNameField.text
+
     Layout.fillWidth: true
 
     tools: PlasmaComponents.ToolBarLayout {
@@ -54,37 +55,16 @@ PlasmaComponents.ToolBar {
         // }
 
         TextField {
-            id: unitName
+            id: unitNameField
             placeholderText: i18n("Add systemd unit");
             Layout.fillWidth: true;
         }
 
-        PlasmaComponents.ToolButton {
+
+        ToolButton {
             id: addButton
-            iconSource: "list-add"
-            flat: true
-            enabled: false
-
-            Binding on enabled {
-                // Enable it when something new is selected
-                // when: unitFileName.currentIndex != -1 &&
-                when: !conn.units.units.includes(unitName.text) && conn.unitFiles.has(unitName.text)
-                value: true
-                restoreMode: Binding.RestoreBindingOrValue
-            }
-
-            onClicked: {
-                // Play it twice as safe. Make sure the unit isn't already added.
-                if (!conn.units.units.includes(unitName.text)) {
-                    conn.units.loadUnit(unitName.text);
-                }
-                saveConfiguration();
-            }
-        }
-
-        PlasmaComponents.ToolButton {
-            id: configureButton
-            iconSource: "configure"
+            action: actions.addUnitAction
+            display: AbstractButton.IconOnly
             flat: true
         }
 

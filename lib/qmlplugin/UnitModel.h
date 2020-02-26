@@ -95,6 +95,8 @@ public slots:
 
 private:
 
+    void unloadUnits();
+
     void loadUnit(const QDBusObjectPath &unitPath);
 
     class UnitModelPrivate *d_ptr;
