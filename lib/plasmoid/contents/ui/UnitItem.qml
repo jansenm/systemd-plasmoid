@@ -21,51 +21,82 @@ import QtQuick 2.14
 import QtQuick.Layouts 1.14
 import QtQuick.Controls 2.14
 
-import org.kde.plasma.components 2.0 as PlasmaComponents2
 import org.kde.plasma.components 3.0 as PlasmaComponents
+import org.kde.plasma.extras 2.0 as PlasmaExtras
 
-PlasmaComponents2.ListItem {
 
+PlasmaComponents.ItemDelegate {
     id: unitItem
 
-    height: unitRow.height
+    height: unitRow.height + units.smallSpacing
 
-    UnitActions {
-        id: actions
+    UnitActions { id: actions }
+
+    MouseArea {
+        id: mousearea
+        anchors.fill: unitItem
+        hoverEnabled: true
+    }
+
+    Rectangle{
+        id: background
+        anchors.fill: unitItem
+        color: theme.backgroundColor
+        opacity: 0.1
+        z: -1
+    }
+
+    states: State {
+        name: "Focused"
+        when: mousearea.containsMouse
+        PropertyChanges {
+            target: background
+            color: theme.viewHoverColor
+        }
     }
 
     RowLayout {
         id: unitRow
-        width: unitItem.width
+        width: parent.width
 
         ColumnLayout {
+            Layout.fillWidth: true
 
-            PlasmaComponents.Label {
+            RowLayout {
                 Layout.fillWidth: true
-                text: model.Unit
+
+                PlasmaComponents.Label {
+                    text: model.Unit
+                    font.bold: true
+                    Layout.fillWidth: true
+                }
+
+                PlasmaComponents.Label {
+                    text: model.ActiveState
+                    font.pointSize: theme.smallestFont.pointSize
+                }
+
+                PlasmaComponents.Label {
+                    text: model.LoadState
+                    font.pointSize: theme.smallestFont.pointSize
+                }
+
+                PlasmaComponents.Label {
+                    text: model.SubState
+                    font.pointSize: theme.smallestFont.pointSize
+                }
             }
 
-            PlasmaComponents.Label {
-                Layout.fillWidth: true
-                text: model.Description
-                font.pointSize: theme.smallestFont.pointSize
+            RowLayout {
+
+                PlasmaComponents.Label {
+                    Layout.fillWidth: true
+                    text: model.Description
+                    font.italic: true
+                    font.pointSize: theme.smallestFont.pointSize
+                }
 
             }
-        }
-
-        PlasmaComponents.Label {
-            text: model.ActiveState
-            font.pointSize: theme.smallestFont.pointSize
-        }
-
-        PlasmaComponents.Label {
-            text: model.LoadState
-            font.pointSize: theme.smallestFont.pointSize
-        }
-
-        PlasmaComponents.Label {
-            text: model.SubState
-            font.pointSize: theme.smallestFont.pointSize
         }
 
         PlasmaComponents.ToolButton {
@@ -101,4 +132,6 @@ PlasmaComponents2.ListItem {
             }
         }
     }
+
+
 }

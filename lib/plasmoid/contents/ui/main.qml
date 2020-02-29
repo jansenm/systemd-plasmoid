@@ -83,7 +83,9 @@ Item {
             ListView {
                 id: listview
                 model: conn.units
-                delegate: UnitItem {}
+                delegate: UnitItem {
+                    width: scroller.width
+                }
                 Component.onCompleted: {
                     loadConfiguration();
                     conn.units.onUnitsChanged.connect(saveConfiguration);
