@@ -69,7 +69,10 @@ Item {
     ColumnLayout {
         anchors.fill: parent
 
-        Toolbar { id: toolbar }
+        Toolbar {
+            id: toolbar
+            Layout.fillWidth: true
+        }
 
         // Or should we use PlasmaExtra.ScrollArea here? So Confusing.
         PlasmaExtra.ScrollArea {

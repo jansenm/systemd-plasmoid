@@ -18,55 +18,32 @@
  *
  */
 import QtQuick 2.14
-import QtQuick.Layouts 1.14
 import QtQuick.Controls 2.14
-import QtQml 2.14
+import QtQuick.Layouts 1.14
+import QtQuick.Templates 2.7 as T
 
-import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.plasma.components 3.0 as PlasmaComponents3
 
-import org.kde.systemd 0.1
-
-PlasmaComponents.ToolBar {
+PlasmaComponents3.ToolBar {
+    id: toolbar
 
     property string unitName: unitNameField.text
 
-    Layout.fillWidth: true
+    RowLayout {
+        width: toolbar.width
 
-    tools: PlasmaComponents.ToolBarLayout {
-
-        // TODO This neither works with the default qml platform theme. And the list is to long and the autocompletion
-        //      not really helpfull. We would need some fuzzy html like stuff.
-        // ComboBox {
-        //     id: unitFileName
-        //     Layout.fillWidth: true
-        //     editable: true
-        //     textRole: "Name"
-        //     model: conn.unitFiles
-
-        //     delegate: ItemDelegate {
-
-        //         contentItem: Column {
-        //             Text {
-        //                 bottomPadding: 1
-        //                 text: "<b>%1</b><br><small>%2</small>".arg(model.Name).arg(model.State)
-        //             }
-        //         }
-        //     }
-        // }
-
-        TextField {
+        PlasmaComponents3.TextField {
             id: unitNameField
-            placeholderText: i18n("Add systemd unit");
-            Layout.fillWidth: true;
+            placeholderText: i18n("Add systemd unit")
+            Layout.fillWidth: true
         }
 
-
-        ToolButton {
+        PlasmaComponents3.ToolButton {
             id: addButton
+            text: ""        // fixme Neded because the plasma toolbutton prior to an currently (29. Feb. 2020) unreleased version
+                            // Ignore display and only check if text is filled. Using action fills it.
+            display: T.AbstractButton.IconOnly
             action: actions.addUnitAction
-            display: AbstractButton.IconOnly
-            flat: true
         }
-
     }
 }
