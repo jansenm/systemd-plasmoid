@@ -27,6 +27,7 @@ import org.kde.plasma.components 3.0 as PlasmaComponents
 PlasmaComponents2.ListItem {
 
     id: unitItem
+
     height: unitRow.height
 
     UnitActions {
@@ -67,37 +68,35 @@ PlasmaComponents2.ListItem {
             font.pointSize: theme.smallestFont.pointSize
         }
 
-        Rectangle {
-            height: unitMenu.height
-            width: unitMenu.width
-            color: "transparent"
+        PlasmaComponents.ToolButton {
+            id: unitMenu
+            icon.name: "application-menu"
 
-            PlasmaComponents.ToolButton {
-                id: unitMenu
-                icon.name: "application-menu"
+            onClicked: {
+                    menu.open()
+            }
 
-                onClicked: {
-                    menu.popup();
+            PlasmaComponents.Menu {
+                id: menu
+
+                PlasmaComponents.MenuItem {
+                    action: actions.startUnitAction
                 }
 
+                PlasmaComponents.MenuItem {
+                    action: actions.stopUnitAction
+                }
 
+                PlasmaComponents.MenuItem {
+                    action: actions.reloadUnitAction
+                }
 
-                Menu {
-                    id: menu
-                    title: model.Unit
+                PlasmaComponents.MenuItem {
+                    action: actions.isolateUnitAction
+                }
 
-                    MenuItem {
-                        id: header
-                        text: model.Unit
-                        }
-
-                    contentData: [
-                        header,
-                        actions.startUnitAction,
-                        actions.stopUnitAction,
-                        actions.restartUnitAction,
-                        actions.isolateUnitAction
-                    ]
+                PlasmaComponents.MenuItem {
+                    action: actions.reloadUnitAction
                 }
             }
         }

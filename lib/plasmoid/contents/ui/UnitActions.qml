@@ -48,6 +48,15 @@ Item {
         }
     }
 
+    property var removeUnitAction:  Action {
+        text: i18n("Remove")
+
+        onTriggered: {
+            console.log("removing " + model.Unit)
+            conn.units.removeUnit(model.Unit);
+        }
+    }
+
     property var restartUnitAction:  Action {
         text: i18n("Restart")
         enabled: false

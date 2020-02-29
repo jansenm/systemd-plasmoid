@@ -51,6 +51,35 @@ UnitModel::~UnitModel() {
     delete d_ptr;
 }
 
+void
+UnitModel::addUnit(const QDBusObjectPath &unitPath) {
+    Q_D(UnitModel);
+    QDBusConnection bus = d->m->connection();
+    auto *unit = new Systemd::Unit(bus, QDBusObjectPath(unitPath), this);
+    beginInsertRows(QModelIndex(), 0, 0);
+    d->m_units.prepend(unit);
+    connect(unit, &Systemd::Unit::changed, this, &UnitModel::unitChanged);
+    endInsertRows();
+    d->m_unitNames.prepend(unit->id());
+    emit unitsChanged();
+}
+
+void
+UnitModel::addUnit(const QString &unitName) {
+    Q_D(UnitModel);
+
+    auto call = d->m->loadUnitPath(
+            unitName,
+            [this, unitName](const QDBusPendingReply<QDBusObjectPath> &reply, const QDBusObjectPath &path) -> void {
+
+                if (!reply.isValid()) {
+                    // TODO: remove unit from unitlist. This means the name is invalid, not that the unit is not known.
+                    qWarning() << "UnitModel::loadUnit(" << unitName << "): reply is not valid";
+                }
+                this->addUnit(path);
+            });
+}
+
 QVariant
 UnitModel::data(const QModelIndex &index, int role) const {
     Q_D(const UnitModel);
@@ -94,45 +123,39 @@ UnitModel::data(const QModelIndex &index, int role) const {
 
 void UnitModel::unloadUnits() {
     Q_D(UnitModel);
-    emit beginRemoveColumns(QModelIndex(), 0, d->m_units.size());
+    emit beginRemoveRows(QModelIndex(), 0, d->m_units.size());
     qDeleteAll(d->m_units);
     d->m_units.clear();
     d->m_unitNames.clear();
-    emit endRemoveColumns();
-}
-
-void
-UnitModel::loadUnit(const QDBusObjectPath &unitPath) {
-    Q_D(UnitModel);
-    QDBusConnection bus = d->m->connection();
-    auto *unit = new Systemd::Unit(bus, QDBusObjectPath(unitPath), this);
-    beginInsertRows(QModelIndex(), 0, 0);
-    d->m_units.prepend(unit);
-    connect(unit, &Systemd::Unit::changed, this, &UnitModel::unitChanged);
-    endInsertRows();
-    d->m_unitNames.prepend(unit->id());
-    emit unitsChanged();
-}
-
-void
-UnitModel::loadUnit(const QString &unitName) {
-    Q_D(UnitModel);
-
-    auto call = d->m->loadUnitPath(
-            unitName,
-            [this, unitName](const QDBusPendingReply<QDBusObjectPath> &reply, const QDBusObjectPath &path) -> void {
-
-                if (!reply.isValid()) {
-                    // TODO: remove unit from unitlist. This means the name is invalid, not that the unit is not known.
-                    qWarning() << "UnitModel::loadUnit(" << unitName << "): reply is not valid";
-                }
-                this->loadUnit(path);
-            });
+    emit endRemoveRows();
 }
 
 void UnitModel::reloadUnit(const QString &name, const QString &mode) {
     Q_D(UnitModel);
     QDBusPendingCall call = d->m->reloadUnit(name, mode);
+}
+
+void
+UnitModel::removeUnit(const QString &unitName) {
+    Q_D(UnitModel);
+
+    int index = 0;
+    foreach(auto *unit, d->m_units) {
+        qWarning() << "checking " << unit->property("id").toString();
+        if (unit->property("id").toString() == unitName) {
+            qWarning() << "found " << unitName << " at " << index;
+            emit beginRemoveRows(QModelIndex(), index, index+1);
+            delete d->m_units.takeAt(index);
+            d->m_unitNames.removeOne(unitName);
+            emit endRemoveRows();
+            qWarning() << d->m_units.size();
+            qWarning() << d->m_unitNames.size();
+
+            emit unitsChanged();
+            break;
+        }
+        ++index;
+    }
 }
 
 void UnitModel::restartUnit(const QString &name, const QString &mode) {
@@ -175,7 +198,7 @@ UnitModel::setUnits(const QStringList &unitNames) {
     unloadUnits();
 
     for (const QString &unitName: unitNames) {
-        loadUnit(unitName);
+        addUnit(unitName);
     }
 
     emit unitsChanged();

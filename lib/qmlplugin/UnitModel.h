@@ -74,7 +74,9 @@ signals:
 
 public slots:
 
-    Q_INVOKABLE void loadUnit(const QString &unitName);
+    Q_INVOKABLE void addUnit(const QString &unitName);
+
+    Q_INVOKABLE void removeUnit(const QString &unitName);
 
 private slots:
 
@@ -97,7 +99,7 @@ private:
 
     void unloadUnits();
 
-    void loadUnit(const QDBusObjectPath &unitPath);
+    void addUnit(const QDBusObjectPath &unitPath);
 
     class UnitModelPrivate *d_ptr;
 
