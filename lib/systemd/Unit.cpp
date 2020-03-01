@@ -122,13 +122,21 @@ Unit::propertiesChanged(const QString &interface, const QVariantMap changed, QSt
     Q_UNUSED(invalid);
 
     QVariantMap::const_iterator it = changed.begin();
-    while(it != changed.end()) {
-        if (it.key() == "loadState") {
-            emit loadStateChanged(it.value().toString());
-        } else if (it.key() == "activeState") {
+    while (it != changed.end()) {
+        if (it.key() == "activeState") {
             emit activeStateChanged(it.value().toString());
+        } else if (it.key() == "result") {
+            emit resultChanged(it.value().toString());
+        } else if (it.key() == "statusErrno") {
+            emit statusErrnoChanged(it.value().toInt());
+        } else if (it.key() == "statusText") {
+            emit statusTextChanged(it.value().toString());
+        } else if (it.key() == "subState") {
+            emit subStateChanged(it.value().toString());
+        } else if (it.key() == "subState") {
+            emit subStateChanged(it.value().toString());
         }
-        // TODO handle the rest
+        // TODO What about the rest
         ++it;
     }
 

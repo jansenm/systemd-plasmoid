@@ -25,6 +25,7 @@
 
 #include "UnitFile.h"
 #include "UnitInfo.h"
+#include "Changes.h"
 #include "systemd-qt_export.h"
 
 namespace Systemd {
@@ -33,7 +34,7 @@ namespace Systemd {
     Q_OBJECT
         Q_PROPERTY(QString version
                            READ
-                           version
+                                   version
                            CONSTANT)
 
     public:
@@ -42,6 +43,30 @@ namespace Systemd {
         ~Manager() override;
 
         QDBusConnection connection() const;
+
+        /**
+         * @warning systemd changes the files but not its state. Call reload() when finished.
+         *
+         * Also mask and unmask (from systemd kcm)
+         */
+        QDBusPendingCall enableUnitFiles(
+                const QStringList &unitFiles,
+                bool runtimeOnly,
+                bool replace,
+                std::function<void(const QDBusPendingReply<> reply,
+                                   bool success,
+                                   const ChangesList &changes)> callback = nullptr,
+                QObject *parent = nullptr);
+
+        /**
+         * @warning systemd changes the files but not its state. Call reload() when finished.
+         */
+        QDBusPendingCall disableUnitFiles(
+                const QStringList &unitFiles,
+                bool runtimeOnly,
+                std::function<void(const QDBusPendingReply<> reply,
+                                   const ChangesList &changes)> callback = nullptr,
+                QObject *parent = nullptr);
 
         QDBusPendingCall getUnitFileState(
                 const QString &name,
@@ -67,6 +92,8 @@ namespace Systemd {
                 const QString &name,
                 std::function<void(const QDBusPendingReply<> reply,
                                    const QDBusObjectPath &path)>);
+
+        QDBusPendingCall reload();
 
         QDBusPendingCall reloadUnit(
                 const QString &name,

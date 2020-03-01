@@ -20,6 +20,8 @@
 #include "Manager.h"
 #include "UnitInfo_p.h"
 #include "UnitFile_p.h"
+#include "Changes_p.h"
+#include "Changes.h"
 
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QtDBus>
@@ -47,11 +49,15 @@ Manager::Manager(QDBusConnection bus, QObject *parent)
     qDBusRegisterMetaType<UnitInfoPrivateList>();
     qDBusRegisterMetaType<UnitFilePrivate>();
     qDBusRegisterMetaType<UnitFilePrivateList>();
+    qDBusRegisterMetaType<ChangesPrivate>();
+    qDBusRegisterMetaType<ChangesPrivateList>();
 
     connect(&d->iface, SIGNAL(UnitNew(QString, QDBusObjectPath)),
             this, SIGNAL(unitNew(QString, QDBusObjectPath)));
     connect(&d->iface, SIGNAL(UnitRemoved(QString, QDBusObjectPath)),
             this, SIGNAL(unitRemoved(QString, QDBusObjectPath)));
+    connect(&d->iface, SIGNAL(UnitFilesChanged()),
+            this, SIGNAL(unitFilesChanged()));
 }
 
 Manager::~Manager() {
@@ -63,6 +69,95 @@ Manager::connection() const {
     Q_D(const Manager);
     return d->iface.connection();
 }
+
+QDBusPendingCall
+Manager::enableUnitFiles(
+        const QStringList &unitFiles,
+        bool runtimeOnly,
+        bool replace,
+        std::function<void(const QDBusPendingReply<> reply,
+                // TODO is this really success here?
+                           bool success,
+                           const ChangesList &changes)> callback,
+        QObject *parent) {
+    Q_D(Manager);
+
+    if (!d->iface.isValid()) {
+        Q_ASSERT(d->iface.isValid());
+        return QDBusPendingCall::fromError(d->iface.lastError());
+    }
+
+    QDBusMessage message = QDBusMessage::createMethodCall(
+            d->iface.service(),
+            d->iface.path(),
+            d->iface.interface(),
+            "EnableUnitFiles");
+    message.setArguments(QVariantList({unitFiles, runtimeOnly, replace}));
+    // TODO: Why is it needed here but not used for start/stop/reload?
+    message.setInteractiveAuthorizationAllowed(true);
+    QDBusPendingCall call = QDBusConnection::systemBus().asyncCall(message);
+
+    if (!callback) {
+        return call;
+    }
+
+    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher,
+            &QDBusPendingCallWatcher::finished,
+            [callback, parent](QDBusPendingCallWatcher *watcher) {
+                QDBusPendingReply<bool, ChangesPrivateList> reply = *watcher;
+                ChangesList list;
+                Q_FOREACH(auto change, reply.argumentAt(1).value<ChangesPrivateList>()) {
+                        list.append(new Changes(change, parent));
+                    }
+                callback(reply, reply.argumentAt(0).toBool(), reply.argumentAt(1).value<ChangesList>());
+                watcher->deleteLater();
+            });
+    return call;
+}
+
+QDBusPendingCall
+Manager::disableUnitFiles(
+        const QStringList &unitFiles,
+        bool runtimeOnly,
+        std::function<void(const QDBusPendingReply<> reply,
+                           const ChangesList &changes)> callback,
+        QObject *parent) {
+    Q_D(Manager);
+
+    if (!d->iface.isValid()) {
+        Q_ASSERT(d->iface.isValid());
+        return QDBusPendingCall::fromError(d->iface.lastError());
+    }
+
+    QDBusMessage message = QDBusMessage::createMethodCall(
+            d->iface.service(),
+            d->iface.path(),
+            d->iface.interface(),
+            "DisableUnitFiles");
+    message.setArguments(QVariantList({unitFiles, runtimeOnly}));
+    // TODO: Why is it needed here but not used for start/stop/reload?
+    message.setInteractiveAuthorizationAllowed(true);
+    QDBusPendingCall call = QDBusConnection::systemBus().asyncCall(message);
+    if (!callback) {
+        return call;
+    }
+
+    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher,
+            &QDBusPendingCallWatcher::finished,
+            [parent, callback](QDBusPendingCallWatcher *watcher) {
+                QDBusPendingReply<ChangesPrivateList> reply = *watcher;
+                ChangesList list;
+                Q_FOREACH(auto change, reply.argumentAt(0).value<ChangesPrivateList>()) {
+                        list.append(new Changes(change, parent));
+                    }
+                callback(reply, reply.argumentAt(0).value<ChangesList>());
+                watcher->deleteLater();
+            });
+    return call;
+}
+
 
 QDBusPendingCall
 Manager::getUnitFileState(const QString &name, std::function<void(const QDBusPendingReply<> reply,
@@ -132,7 +227,7 @@ Manager::listUnits(std::function<void(const QDBusPendingReply<>, UnitInfoList)> 
             [parent, callback](QDBusPendingCallWatcher *watcher) {
                 UnitInfoList list;
                 QDBusPendingReply<UnitInfoPrivateList> reply = *watcher;
-                        foreach (UnitInfoPrivate unit, reply.value()) {
+                Q_FOREACH(UnitInfoPrivate unit, reply.value()) {
                         list.append(new UnitInfo(unit, parent));
                     }
                 callback(reply, list);
@@ -194,6 +289,18 @@ Manager::loadUnitPath(const QString &name,
                 callback(reply, reply.value());
                 watcher->deleteLater();
             });
+    return call;
+}
+
+QDBusPendingCall Manager::reload() {
+    Q_D(Manager);
+
+    if (!d->iface.isValid()) {
+        Q_ASSERT(d->iface.isValid());
+        return QDBusPendingCall::fromError(d->iface.lastError());
+    }
+
+    QDBusPendingCall call = d->iface.asyncCall("Reload");
     return call;
 }
 

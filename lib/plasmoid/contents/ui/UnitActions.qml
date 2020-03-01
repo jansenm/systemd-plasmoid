@@ -3,6 +3,37 @@ import QtQuick.Controls 2.14
 import QtQml 2.14
 
 Item {
+
+    property var enableUnitAction:  Action {
+        text: i18n("Enable")
+        enabled: false
+
+        onTriggered: {
+            conn.units.enableUnitFiles([model.Unit], false, true);
+        }
+
+        Binding on enabled {
+            when: ["disabled", "enabled-runtime", "linked", "indirect"].indexOf(model.UnitFileState) >= 0
+            value: true
+            restoreMode: Binding.RestoreBindingOrValue
+        }
+    }
+
+    property var disableUnitAction:  Action {
+        text: i18n("Disable")
+        enabled: false
+
+        onTriggered: {
+            conn.units.disableUnitFiles([model.Unit], false, true);
+        }
+
+        Binding on enabled {
+            when: ["enabled", "enabled-runtime"].indexOf(model.UnitFileState) >= 0
+            value: true
+            restoreMode: Binding.RestoreBindingOrValue
+        }
+    }
+
     property var isolateUnitAction:  Action {
         text: i18n("Isolate")
         enabled: false

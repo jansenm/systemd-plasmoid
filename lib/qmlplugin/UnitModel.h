@@ -86,7 +86,13 @@ private slots:
 
     void unitChanged(const Systemd::Unit &unit);
 
+    void unitFilesChanged();
+
 public slots:
+    Q_INVOKABLE void enableUnitFiles(const QStringList &units, bool runtime, bool replace);
+
+    Q_INVOKABLE void disableUnitFiles(const QStringList &units, bool runtime);
+
     Q_INVOKABLE void startUnit(const QString &name, const QString &mode);
 
     Q_INVOKABLE void stopUnit(const QString &name, const QString &mode);

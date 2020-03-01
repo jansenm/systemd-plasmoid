@@ -1,5 +1,6 @@
 add_library(systemd-qt SHARED
         debug.cpp debug.h
+        Changes.cpp Changes.h Changes_p.h
         UnitInfo.cpp UnitInfo.h UnitInfo_p.h
         UnitFile.cpp UnitFile.h UnitFile_p.h
         Unit.cpp Unit.h

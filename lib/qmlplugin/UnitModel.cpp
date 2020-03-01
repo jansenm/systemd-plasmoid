@@ -21,9 +21,11 @@
 #include "UnitModel.h"
 
 #include <Manager.h>
+#include <Changes_p.h>
+
+#include <QtGlobal>
 #include <QDBusConnection>
 #include <QDBusPendingCallWatcher>
-#include <QtCore/QThread>
 
 using Systemd::Manager;
 
@@ -34,7 +36,7 @@ public:
             : m(manager) {}
 
     Manager *m;
-    QList<QObject *> m_units;
+    QList<Systemd::Unit *> m_units;
     QStringList m_unitNames;
 };
 
@@ -43,6 +45,7 @@ UnitModel::UnitModel(Manager *manager, QObject *parent)
     Q_D(UnitModel);
     connect(d->m, &Systemd::Manager::unitNew, this, &UnitModel::unitNew);
     connect(d->m, &Systemd::Manager::unitRemoved, this, &UnitModel::unitRemoved);
+    connect(d->m, &Systemd::Manager::unitFilesChanged, this, &UnitModel::unitFilesChanged);
 }
 
 UnitModel::~UnitModel() {
@@ -74,10 +77,26 @@ UnitModel::addUnit(const QString &unitName) {
 
                 if (!reply.isValid()) {
                     // TODO: remove unit from unitlist. This means the name is invalid, not that the unit is not known.
-                    qWarning() << "UnitModel::loadUnit(" << unitName << "): reply is not valid";
                 }
                 this->addUnit(path);
             });
+}
+
+void UnitModel::enableUnitFiles(const QStringList &units, bool runtime, bool replace) {
+    Q_D(UnitModel);
+
+    QDBusPendingCall call = d->m->enableUnitFiles(
+            units,
+            runtime,
+            replace,
+            [](const QDBusPendingReply<> &,
+               bool,
+               const Systemd::ChangesList &changes) {
+                qDeleteAll(changes);
+                // TODO: handle error?
+            }, this);
+
+    d->m->reload();
 }
 
 QVariant
@@ -121,14 +140,21 @@ UnitModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-void UnitModel::unloadUnits() {
+void UnitModel::disableUnitFiles(const QStringList &units, bool runtime) {
     Q_D(UnitModel);
-    emit beginRemoveRows(QModelIndex(), 0, d->m_units.size());
-    qDeleteAll(d->m_units);
-    d->m_units.clear();
-    d->m_unitNames.clear();
-    emit endRemoveRows();
+    QDBusPendingCall call = d->m->disableUnitFiles(
+            units,
+            runtime,
+            [](
+                    const QDBusPendingReply<> &,
+                    const Systemd::ChangesList &changes) {
+                // TODO: handle error?
+                qDeleteAll(changes);
+            }, this);
+
+    d->m->reload();
 }
+
 
 void UnitModel::reloadUnit(const QString &name, const QString &mode) {
     Q_D(UnitModel);
@@ -140,22 +166,19 @@ UnitModel::removeUnit(const QString &unitName) {
     Q_D(UnitModel);
 
     int index = 0;
-    foreach(auto *unit, d->m_units) {
-        qWarning() << "checking " << unit->property("id").toString();
-        if (unit->property("id").toString() == unitName) {
-            qWarning() << "found " << unitName << " at " << index;
-            emit beginRemoveRows(QModelIndex(), index, index+1);
-            delete d->m_units.takeAt(index);
-            d->m_unitNames.removeOne(unitName);
-            emit endRemoveRows();
-            qWarning() << d->m_units.size();
-            qWarning() << d->m_unitNames.size();
 
-            emit unitsChanged();
-            break;
+            foreach(auto *unit, d->m_units) {
+            if (unit->property("id").toString() == unitName) {
+                emit beginRemoveRows(QModelIndex(), index, index + 1);
+                delete d->m_units.takeAt(index);
+                d->m_unitNames.removeOne(unitName);
+                emit endRemoveRows();
+
+                emit unitsChanged();
+                break;
+            }
+            ++index;
         }
-        ++index;
-    }
 }
 
 void UnitModel::restartUnit(const QString &name, const QString &mode) {
@@ -226,17 +249,25 @@ UnitModel::unitChanged(const Systemd::Unit &unit) {
     }
 }
 
+void UnitModel::unitFilesChanged() {
+    Q_D(UnitModel);
+    for (Systemd::Unit *unit: d->m_units) {
+        unitChanged(*unit);
+    }
+}
 
 void
 UnitModel::unitNew(const QString &unit, const QDBusObjectPath &path) {
     Q_UNUSED(path);
-    qDebug() << "unitNew(" << unit << ")";
+    Q_UNUSED(unit);
+    // qDebug() << "unitNew(" << unit << ")";
 }
 
 void
 UnitModel::unitRemoved(const QString &unit, const QDBusObjectPath &path) {
     Q_UNUSED(path);
-    qDebug() << "unitRemoved(" << unit << ")";
+    Q_UNUSED(unit);
+    // qDebug() << "unitRemoved(" << unit << ")";
 }
 
 
@@ -246,3 +277,11 @@ UnitModel::units() const {
     return d->m_unitNames;
 }
 
+void UnitModel::unloadUnits() {
+    Q_D(UnitModel);
+    emit beginRemoveRows(QModelIndex(), 0, d->m_units.size());
+    qDeleteAll(d->m_units);
+    d->m_units.clear();
+    d->m_unitNames.clear();
+    emit endRemoveRows();
+}

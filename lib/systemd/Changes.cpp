@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#include "UnitInfo_p.h"
+#include "Changes_p.h"
 #include "debug.h"
 
 #include <QtDBus/QtDBus>
@@ -25,52 +25,50 @@
 using namespace Systemd;
 
 QDBusArgument &
-Systemd::operator<<(QDBusArgument &argument, const UnitInfoPrivate &unit) {
+Systemd::operator<<(QDBusArgument &argument, const ChangesPrivate &unit) {
     argument.beginStructure();
     // clang-format off
-    argument << unit.id
-             << unit.description
-             << unit.load_state
-             << unit.active_state
-             << unit.sub_state
-             << unit.following
-             << unit.unit_path
-             << unit.job_id
-             << unit.job_type
-             << unit.job_path;
+    argument << unit.type
+             << unit.linkName
+             << unit.linkDestination;
     // clang-format on
     argument.endStructure();
     return argument;
 }
 
 const QDBusArgument &
-Systemd::operator>>(const QDBusArgument &argument, UnitInfoPrivate &unit) {
+Systemd::operator>>(const QDBusArgument &argument, ChangesPrivate &unit) {
     argument.beginStructure();
     // clang-format off
-    argument >> unit.id
-             >> unit.description
-             >> unit.load_state
-             >> unit.active_state
-             >> unit.sub_state
-             >> unit.following
-             >> unit.unit_path
-             >> unit.job_id
-             >> unit.job_type
-             >> unit.job_path;
+    argument >> unit.type
+             >> unit.linkName
+             >> unit.linkDestination;
     // clang-format on
     argument.endStructure();
     return argument;
 }
 
-UnitInfo::UnitInfo(const UnitInfoPrivate &d_ptr, QObject *parent)
-        : QObject(parent), d_ptr(new UnitInfoPrivate(d_ptr)) {}
+Changes::Changes(const ChangesPrivate &d_ptr, QObject *parent)
+        : QObject(parent), d_ptr(new ChangesPrivate(d_ptr)) {}
 
-UnitInfo::~UnitInfo() {
+Changes::~Changes() {
     delete d_ptr;
 }
 
 QString
-UnitInfo::id() const {
-    Q_D(const UnitInfo);
-    return d->id;
+Changes::type() const {
+    Q_D(const Changes);
+    return d->type;
+}
+
+QString
+Changes::linkName() const {
+    Q_D(const Changes);
+    return d->linkName;
+}
+
+QString
+Changes::linkDestination() const {
+    Q_D(const Changes);
+    return d->linkDestination;
 }

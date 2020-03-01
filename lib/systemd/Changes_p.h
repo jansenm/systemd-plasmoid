@@ -17,43 +17,34 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
-#ifndef SYSTEMD_KDE_UNITINFO_P_H
-#define SYSTEMD_KDE_UNITINFO_P_H
+#ifndef SYSTEMD_KDE_CHANGES_P_H
+#define SYSTEMD_KDE_CHANGES_P_H
 
-#include "UnitInfo.h"
+#include "Changes.h"
 
 #include <QtCore/QString>
 #include <QtDBus/QDBusObjectPath>
 
 namespace Systemd {
 
-    struct UnitInfoPrivate {
-        QString unit_file_status;
-        QString unit_file;
-        QString job_type;
-        QString following;
-        QString sub_state;
-        QString active_state;
-        QString load_state;
-        QString description;
-        QString id;
-        QDBusObjectPath unit_path;
-        QDBusObjectPath job_path;
-        unsigned int job_id;
+    struct ChangesPrivate {
+        QString type;
+        QString linkName;
+        QString linkDestination;
     };
 
-    typedef QList<UnitInfoPrivate> UnitInfoPrivateList;
+    typedef QList<ChangesPrivate> ChangesPrivateList;
 
     QDBusArgument &
-    operator<<(QDBusArgument &argument, const UnitInfoPrivate &unit);
+    operator<<(QDBusArgument &argument, const ChangesPrivate &unit);
 
     const QDBusArgument &
-    operator>>(const QDBusArgument &argument, UnitInfoPrivate &unit);
+    operator>>(const QDBusArgument &argument, ChangesPrivate &unit);
 
 }
 
-Q_DECLARE_METATYPE(Systemd::UnitInfoPrivate);
+Q_DECLARE_METATYPE(Systemd::ChangesPrivate);
 
-Q_DECLARE_METATYPE(Systemd::UnitInfoPrivateList);
+Q_DECLARE_METATYPE(Systemd::ChangesPrivateList);
 
-#endif // SYSTEMD_KDE_UNITINFO_P_H
+#endif // SYSTEMD_KDE_CHANGES_P_H

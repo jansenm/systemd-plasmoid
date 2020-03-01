@@ -85,6 +85,11 @@ PlasmaComponents.ItemDelegate {
                     text: model.SubState
                     font.pointSize: theme.smallestFont.pointSize
                 }
+
+                PlasmaComponents.Label {
+                    text: model.UnitFileState
+                    font.pointSize: theme.smallestFont.pointSize
+                }
             }
 
             RowLayout {
@@ -123,11 +128,19 @@ PlasmaComponents.ItemDelegate {
                 }
 
                 PlasmaComponents.MenuItem {
+                    action: actions.reloadUnitAction
+                }
+
+                PlasmaComponents.MenuItem {
                     action: actions.isolateUnitAction
                 }
 
                 PlasmaComponents.MenuItem {
-                    action: actions.reloadUnitAction
+                    action: actions.enableUnitAction
+                }
+
+                PlasmaComponents.MenuItem {
+                    action: actions.disableUnitAction
                 }
             }
         }

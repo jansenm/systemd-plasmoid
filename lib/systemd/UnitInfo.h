@@ -27,61 +27,61 @@
 namespace Systemd {
 
 
-class SYSTEMD_QT_EXPORT UnitInfo : public QObject
-{
+    class SYSTEMD_QT_EXPORT UnitInfo : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QString id READ id);
+        Q_PROPERTY(QString id
+                           READ
+                           id);
 
-    class UnitInfoPrivate* d_ptr;
+        class UnitInfoPrivate *d_ptr;
 
-  public:
-    /**
-     * The unit state.
-     *
-     * > Units may be "active" (meaning started, bound, plugged in, ...,
-     *depending on the unit type, see below), or > "inactive" (meaning stopped,
-     *unbound, unplugged, ...), as well as in the process of being activated or
-     * > deactivated, i.e. between the two states (these states are called
-     *"activating", "deactivating"). A special > "failed" state is available as
-     *well, which is very similar to "inactive" and is entered when the service
-     *failed > in some way (process returned error code on exit, or crashed, or
-     *an operation timed out). If this state is > entered, the cause will be
-     *logged, for later reference. Note that the various unit types may have a
-     *number of > additional substates, which are mapped to the five generalized
-     *unit states described here.
-     **/
-    enum State
-    {
-        active,       //!< The unit is active
-        inactive,     //!< The unit is inactive
-        activating,   //!< The unit is activating
-        deactivating, //!< The unit is deactivating
-        failed        //!< The unit failed
+    public:
+        /**
+         * The unit state.
+         *
+         * > Units may be "active" (meaning started, bound, plugged in, ...,
+         *depending on the unit type, see below), or > "inactive" (meaning stopped,
+         *unbound, unplugged, ...), as well as in the process of being activated or
+         * > deactivated, i.e. between the two states (these states are called
+         *"activating", "deactivating"). A special > "failed" state is available as
+         *well, which is very similar to "inactive" and is entered when the service
+         *failed > in some way (process returned error code on exit, or crashed, or
+         *an operation timed out). If this state is > entered, the cause will be
+         *logged, for later reference. Note that the various unit types may have a
+         *number of > additional substates, which are mapped to the five generalized
+         *unit states described here.
+         **/
+        enum State {
+            active,       //!< The unit is active
+            inactive,     //!< The unit is inactive
+            activating,   //!< The unit is activating
+            deactivating, //!< The unit is deactivating
+            failed        //!< The unit failed
+        };
+
+        Q_ENUM(State)
+
+    public:
+        /**
+         * Create a new unit object.
+         *
+         * @param reply         The dbus reply object to initialize from
+         * @param parent        The parent object or nullptr
+         */
+        UnitInfo(const UnitInfoPrivate &p, QObject *parent = nullptr);
+
+        /**
+         * Destroy the unit object.
+         */
+        ~UnitInfo() override;
+
+        QString id() const;
+
+    private:
+        Q_DECLARE_PRIVATE(UnitInfo);
     };
 
-    Q_ENUM(State)
-
-  public:
-    /**
-     * Create a new unit object.
-     *
-     * @param reply         The dbus reply object to initialize from
-     * @param parent        The parent object or nullptr
-     */
-    UnitInfo(const UnitInfoPrivate &p, QObject* parent = nullptr);
-
-    /**
-     * Destroy the unit object.
-     */
-    ~UnitInfo() override;
-
-    QString id() const;
-
-  private:
-    Q_DECLARE_PRIVATE(UnitInfo);
-};
-
-typedef QList<UnitInfo *> UnitInfoList;
+    typedef QList<UnitInfo *> UnitInfoList;
 
 }
 
