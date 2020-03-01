@@ -128,10 +128,6 @@ PlasmaComponents.ItemDelegate {
                 }
 
                 PlasmaComponents.MenuItem {
-                    action: actions.reloadUnitAction
-                }
-
-                PlasmaComponents.MenuItem {
                     action: actions.isolateUnitAction
                 }
 
@@ -142,6 +138,11 @@ PlasmaComponents.ItemDelegate {
                 PlasmaComponents.MenuItem {
                     action: actions.disableUnitAction
                 }
+
+                PlasmaComponents.MenuItem {
+                    action: actions.removeUnitAction
+                }
+
             }
         }
     }
