@@ -13,7 +13,6 @@ Item {
         enabled: false
 
         onTriggered: {
-            console.log("adding unit")
             // Play it twice as safe. Make sure the unit isn't already added.
             if (!conn.units.units.includes(toolbar.unitName)) {
                 conn.units.addUnit(toolbar.unitName);

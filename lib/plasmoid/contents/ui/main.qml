@@ -28,8 +28,21 @@ import org.kde.systemd 0.1
 
 Item {
 
+    function bustypeValue(name) {
+        switch(name) {
+            case "Session": return 0;
+            case "System": default: return 1;
+        }
+    }
+
+    function bustypeName(value) {
+        switch(value) {
+            case 0: return "Session";
+            case 1: default: return "System";
+        }
+    }
+
     function configNeedsSaving() {
-        // console.log("Saving for real" + conn.units.units);
         plasmoid.configNeedsSaving();
     }
 
@@ -39,8 +52,29 @@ Item {
         Qt.callLater(configNeedsSaving);
     }
 
+    function changeConnection(connection) {
+        plasmoid.configuration.bus = bustypeValue(connection);
+        switch(connection) {
+            case "Session":
+                conn.setConnection(Connection.SessionBus);
+                break;
+            default:
+                console.warn("Invalid value ", connection, " for bus encountered. Using system bus.");
+            case "System":
+                conn.setConnection(Connection.SystemBus);
+        }
+    }
+
     function loadConfiguration() {
+        // This will trigger connectionChanged which does the rest.
+        changeConnection(bustypeName(plasmoid.configuration.bus));
+    }
+
+    function connectionChanged() {
+        listview.model = conn.units;
+        toolbar.selectBus(bustypeName(plasmoid.configuration.bus));
         conn.units.units = plasmoid.configuration.units;
+        conn.units.onUnitsChanged.connect(saveConfiguration);
         conn.unitFiles.unitFilesChanged();
     }
 
@@ -87,8 +121,9 @@ Item {
                     width: scroller.width
                 }
                 Component.onCompleted: {
+                    conn.onConnectionChanged.connect(connectionChanged);
                     loadConfiguration();
-                    conn.units.onUnitsChanged.connect(saveConfiguration);
+                    toolbar.busRequested.connect( changeConnection );
                 }
             }
         }

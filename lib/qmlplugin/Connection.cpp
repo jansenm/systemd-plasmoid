@@ -27,7 +27,8 @@
 
 using Systemd::Manager;
 
-struct ConnectionPrivate {
+class ConnectionPrivate {
+public:
 
     ConnectionPrivate() : connection(Connection::SystemBus),
                           units(nullptr),
@@ -59,24 +60,23 @@ Connection::manager() {
     return d->manager;
 }
 
-void Connection::setConnection(Connection::Type connection) {
+bool Connection::setConnection(Connection::Type connection) {
     Q_D(Connection);
-    if (d->connection == connection) {
-        return;
+    if (d->manager && d->connection == connection) {
+        return false;
     }
 
-    delete d->manager;
     delete d->units;
-    d->units=0;
+    d->units = nullptr;
     delete d->unitFiles;
-    d->unitFiles=0;
+    d->unitFiles = nullptr;
+    delete d->manager;
 
     switch (connection) {
         case Connection::SystemBus:
             d->manager = new Manager(QDBusConnection::systemBus(), this);
             break;
         case Connection::SessionBus:
-            delete d->manager;
             d->manager = new Manager(QDBusConnection::sessionBus(), this);
             break;
         default:
@@ -85,7 +85,8 @@ void Connection::setConnection(Connection::Type connection) {
     }
 
     d->connection = connection;
-    emit connectionChanged(connection);
+    emit connectionChanged();
+    return true;
 }
 
 QAbstractItemModel *Connection::units() {

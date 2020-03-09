@@ -62,7 +62,6 @@ public:
         SessionBus,
         SystemBus
     };
-
     Q_ENUM(Type);
 
     explicit Connection(QObject *parent = nullptr);
@@ -71,7 +70,7 @@ public:
 
     Type connection() const;
 
-    void setConnection(Type connection);
+    Q_INVOKABLE bool setConnection(Type connection);
 
     QAbstractItemModel *units();
 
@@ -83,7 +82,7 @@ public:
 
 signals:
 
-    void connectionChanged(const Connection::Type &connection) const;
+    void connectionChanged() const;
     void unitsChanged() const;
     void unitFilesChanged() const;
 

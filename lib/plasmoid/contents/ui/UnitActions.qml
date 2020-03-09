@@ -83,7 +83,6 @@ Item {
         text: i18n("Remove")
 
         onTriggered: {
-            console.log("removing " + model.Unit)
             conn.units.removeUnit(model.Unit);
         }
     }

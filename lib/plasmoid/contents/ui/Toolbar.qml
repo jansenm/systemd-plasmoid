@@ -29,8 +29,22 @@ PlasmaComponents3.ToolBar {
 
     property string unitName: unitNameField.text
 
+    signal busRequested(string bus)
+
+    function selectBus(busName) {
+        bus.currentIndex = bus.find(busName)
+    }
+
     RowLayout {
         width: toolbar.width
+
+        PlasmaComponents3.ComboBox {
+            id: bus
+            model: ["Session", "System"]
+            onActivated: {
+                toolbar.busRequested(bus.currentText);
+            }
+        }
 
         PlasmaComponents3.TextField {
             id: unitNameField

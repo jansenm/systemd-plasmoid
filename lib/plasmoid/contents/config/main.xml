@@ -2,12 +2,20 @@
 <kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
-      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <kcfgfile name=""/>
     <group name="Units">
         <entry name="units" type="StringList">
             <label>Connection Units to monitor</label>
-            <default>-.mount,apache2.service</default>
+            <default>dbus.service,apache2.service</default>
+        </entry>
+        <entry name="bus" type="Enum">
+            <label>DBus Session Type</label>
+            <default>Session</default>
+            <choices>
+                <choice name="Session"/>
+                <choice name="System"/>
+            </choices>
         </entry>
     </group>
 </kcfg>
