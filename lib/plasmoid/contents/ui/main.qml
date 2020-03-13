@@ -121,8 +121,9 @@ Item {
                     width: scroller.width
                 }
                 Component.onCompleted: {
-                    conn.onConnectionChanged.connect(connectionChanged);
                     loadConfiguration();
+                    connectionChanged();
+                    conn.onConnectionChanged.connect(connectionChanged);
                     toolbar.busRequested.connect( changeConnection );
                 }
             }
