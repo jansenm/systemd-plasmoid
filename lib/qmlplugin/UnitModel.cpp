@@ -169,7 +169,7 @@ UnitModel::removeUnit(const QString &unitName) {
 
             foreach(auto *unit, d->m_units) {
             if (unit->property("id").toString() == unitName) {
-                emit beginRemoveRows(QModelIndex(), index, index + 1);
+                emit beginRemoveRows(QModelIndex(), index, index);
                 delete d->m_units.takeAt(index);
                 d->m_unitNames.removeOne(unitName);
                 emit endRemoveRows();
