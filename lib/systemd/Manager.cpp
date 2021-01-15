@@ -18,31 +18,35 @@
  *
  */
 #include "Manager.h"
-#include "UnitInfo_p.h"
-#include "UnitFile_p.h"
-#include "Changes_p.h"
 #include "Changes.h"
+#include "Changes_p.h"
+#include "UnitFile_p.h"
+#include "UnitInfo_p.h"
 
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QtDBus>
 
 using namespace Systemd;
 
-struct Systemd::ManagerPrivate {
-    ManagerPrivate(const QDBusConnection &bus, QObject *parent)
-            : iface(QLatin1String("org.freedesktop.systemd1"),
-                    "/org/freedesktop/systemd1",
-                    "org.freedesktop.systemd1.Manager",
-                    bus,
-                    parent) {
+struct Systemd::ManagerPrivate
+{
+    ManagerPrivate(const QDBusConnection& bus, QObject* parent)
+      : iface(QLatin1String("org.freedesktop.systemd1"),
+              "/org/freedesktop/systemd1",
+              "org.freedesktop.systemd1.Manager",
+              bus,
+              parent)
+    {
         Q_ASSERT(iface.isValid());
     }
 
     QDBusInterface iface;
 };
 
-Manager::Manager(QDBusConnection bus, QObject *parent)
-        : QObject(parent), d_ptr(new ManagerPrivate(bus, this)) {
+Manager::Manager(QDBusConnection bus, QObject* parent)
+  : QObject(parent)
+  , d_ptr(new ManagerPrivate(bus, this))
+{
     Q_D(Manager);
 
     qDBusRegisterMetaType<UnitInfoPrivate>();
@@ -52,34 +56,43 @@ Manager::Manager(QDBusConnection bus, QObject *parent)
     qDBusRegisterMetaType<ChangesPrivate>();
     qDBusRegisterMetaType<ChangesPrivateList>();
 
-    connect(&d->iface, SIGNAL(UnitNew(QString, QDBusObjectPath)),
-            this, SIGNAL(unitNew(QString, QDBusObjectPath)));
-    connect(&d->iface, SIGNAL(UnitRemoved(QString, QDBusObjectPath)),
-            this, SIGNAL(unitRemoved(QString, QDBusObjectPath)));
-    connect(&d->iface, SIGNAL(UnitFilesChanged()),
-            this, SIGNAL(unitFilesChanged()));
+    subscribe();
+
+    connect(&d->iface,
+            SIGNAL(UnitNew(QString, QDBusObjectPath)),
+            this,
+            SIGNAL(unitNew(QString, QDBusObjectPath)));
+    connect(&d->iface,
+            SIGNAL(UnitRemoved(QString, QDBusObjectPath)),
+            this,
+            SIGNAL(unitRemoved(QString, QDBusObjectPath)));
+    connect(
+      &d->iface, SIGNAL(UnitFilesChanged()), this, SIGNAL(unitFilesChanged()));
 }
 
-Manager::~Manager() {
+Manager::~Manager()
+{
     delete d_ptr;
 }
 
 QDBusConnection
-Manager::connection() const {
+Manager::connection() const
+{
     Q_D(const Manager);
     return d->iface.connection();
 }
 
 QDBusPendingCall
 Manager::enableUnitFiles(
-        const QStringList &unitFiles,
-        bool runtimeOnly,
-        bool replace,
-        std::function<void(const QDBusPendingReply<> reply,
-                // TODO is this really success here?
-                           bool success,
-                           const ChangesList &changes)> callback,
-        QObject *parent) {
+  const QStringList& unitFiles,
+  bool runtimeOnly,
+  bool replace,
+  std::function<void(const QDBusPendingReply<> reply,
+                     // TODO is this really success here?
+                     bool success,
+                     const ChangesList& changes)> callback,
+  QObject* parent)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -87,12 +100,11 @@ Manager::enableUnitFiles(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusMessage message = QDBusMessage::createMethodCall(
-            d->iface.service(),
-            d->iface.path(),
-            d->iface.interface(),
-            "EnableUnitFiles");
-    message.setArguments(QVariantList({unitFiles, runtimeOnly, replace}));
+    QDBusMessage message = QDBusMessage::createMethodCall(d->iface.service(),
+                                                          d->iface.path(),
+                                                          d->iface.interface(),
+                                                          "EnableUnitFiles");
+    message.setArguments(QVariantList({ unitFiles, runtimeOnly, replace }));
     // TODO: Why is it needed here but not used for start/stop/reload?
     message.setInteractiveAuthorizationAllowed(true);
     QDBusPendingCall call = QDBusConnection::systemBus().asyncCall(message);
@@ -101,16 +113,19 @@ Manager::enableUnitFiles(
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback, parent](QDBusPendingCallWatcher *watcher) {
+            [callback, parent](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<bool, ChangesPrivateList> reply = *watcher;
                 ChangesList list;
-                Q_FOREACH(auto change, reply.argumentAt(1).value<ChangesPrivateList>()) {
-                        list.append(new Changes(change, parent));
-                    }
-                callback(reply, reply.argumentAt(0).toBool(), reply.argumentAt(1).value<ChangesList>());
+                Q_FOREACH (auto change,
+                           reply.argumentAt(1).value<ChangesPrivateList>()) {
+                    list.append(new Changes(change, parent));
+                }
+                callback(reply,
+                         reply.argumentAt(0).toBool(),
+                         reply.argumentAt(1).value<ChangesList>());
                 watcher->deleteLater();
             });
     return call;
@@ -118,11 +133,12 @@ Manager::enableUnitFiles(
 
 QDBusPendingCall
 Manager::disableUnitFiles(
-        const QStringList &unitFiles,
-        bool runtimeOnly,
-        std::function<void(const QDBusPendingReply<> reply,
-                           const ChangesList &changes)> callback,
-        QObject *parent) {
+  const QStringList& unitFiles,
+  bool runtimeOnly,
+  std::function<void(const QDBusPendingReply<> reply,
+                     const ChangesList& changes)> callback,
+  QObject* parent)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -130,12 +146,11 @@ Manager::disableUnitFiles(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusMessage message = QDBusMessage::createMethodCall(
-            d->iface.service(),
-            d->iface.path(),
-            d->iface.interface(),
-            "DisableUnitFiles");
-    message.setArguments(QVariantList({unitFiles, runtimeOnly}));
+    QDBusMessage message = QDBusMessage::createMethodCall(d->iface.service(),
+                                                          d->iface.path(),
+                                                          d->iface.interface(),
+                                                          "DisableUnitFiles");
+    message.setArguments(QVariantList({ unitFiles, runtimeOnly }));
     // TODO: Why is it needed here but not used for start/stop/reload?
     message.setInteractiveAuthorizationAllowed(true);
     QDBusPendingCall call = QDBusConnection::systemBus().asyncCall(message);
@@ -143,25 +158,27 @@ Manager::disableUnitFiles(
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [parent, callback](QDBusPendingCallWatcher *watcher) {
+            [parent, callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<ChangesPrivateList> reply = *watcher;
                 ChangesList list;
-                Q_FOREACH(auto change, reply.argumentAt(0).value<ChangesPrivateList>()) {
-                        list.append(new Changes(change, parent));
-                    }
+                Q_FOREACH (auto change,
+                           reply.argumentAt(0).value<ChangesPrivateList>()) {
+                    list.append(new Changes(change, parent));
+                }
                 callback(reply, reply.argumentAt(0).value<ChangesList>());
                 watcher->deleteLater();
             });
     return call;
 }
 
-
 QDBusPendingCall
-Manager::getUnitFileState(const QString &name, std::function<void(const QDBusPendingReply<> reply,
-                                                                  const QString &)> callback) {
+Manager::getUnitFileState(
+  const QString& name,
+  std::function<void(const QDBusPendingReply<> reply, const QString&)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -174,10 +191,10 @@ Manager::getUnitFileState(const QString &name, std::function<void(const QDBusPen
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QString> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
@@ -186,8 +203,10 @@ Manager::getUnitFileState(const QString &name, std::function<void(const QDBusPen
 }
 
 QDBusPendingCall
-Manager::getUnitPath(const QString &name,
-                     std::function<void(const QDBusPendingReply<>, const QDBusObjectPath &)> callback) {
+Manager::getUnitPath(const QString& name,
+                     std::function<void(const QDBusPendingReply<>,
+                                        const QDBusObjectPath&)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -200,10 +219,10 @@ Manager::getUnitPath(const QString &name,
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QDBusObjectPath> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
@@ -212,7 +231,10 @@ Manager::getUnitPath(const QString &name,
 }
 
 QDBusPendingCall
-Manager::listUnits(std::function<void(const QDBusPendingReply<>, UnitInfoList)> callback, QObject *parent) {
+Manager::listUnits(
+  std::function<void(const QDBusPendingReply<>, UnitInfoList)> callback,
+  QObject* parent)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -221,15 +243,15 @@ Manager::listUnits(std::function<void(const QDBusPendingReply<>, UnitInfoList)> 
     }
 
     QDBusPendingCall call = d->iface.asyncCall("ListUnits");
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [parent, callback](QDBusPendingCallWatcher *watcher) {
+            [parent, callback](QDBusPendingCallWatcher* watcher) {
                 UnitInfoList list;
                 QDBusPendingReply<UnitInfoPrivateList> reply = *watcher;
-                Q_FOREACH(UnitInfoPrivate unit, reply.value()) {
-                        list.append(new UnitInfo(unit, parent));
-                    }
+                Q_FOREACH (UnitInfoPrivate unit, reply.value()) {
+                    list.append(new UnitInfo(unit, parent));
+                }
                 callback(reply, list);
                 watcher->deleteLater();
             });
@@ -237,8 +259,10 @@ Manager::listUnits(std::function<void(const QDBusPendingReply<>, UnitInfoList)> 
 }
 
 QDBusPendingCall
-Manager::listUnitFiles(std::function<void(const QDBusPendingReply<>, UnitFileList)> callback,
-                       QObject *parent) {
+Manager::listUnitFiles(
+  std::function<void(const QDBusPendingReply<>, UnitFileList)> callback,
+  QObject* parent)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -251,15 +275,15 @@ Manager::listUnitFiles(std::function<void(const QDBusPendingReply<>, UnitFileLis
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [parent, callback](QDBusPendingCallWatcher *watcher) {
+            [parent, callback](QDBusPendingCallWatcher* watcher) {
                 UnitFileList list;
                 QDBusPendingReply<UnitFilePrivateList> reply = *watcher;
-                        foreach (UnitFilePrivate unit, reply.value()) {
-                        list.append(new UnitFile(unit, parent));
-                    }
+                foreach (UnitFilePrivate unit, reply.value()) {
+                    list.append(new UnitFile(unit, parent));
+                }
                 callback(reply, list);
                 watcher->deleteLater();
             });
@@ -267,8 +291,10 @@ Manager::listUnitFiles(std::function<void(const QDBusPendingReply<>, UnitFileLis
 }
 
 QDBusPendingCall
-Manager::loadUnitPath(const QString &name,
-                      std::function<void(const QDBusPendingReply<>, const QDBusObjectPath &)> callback) {
+Manager::loadUnitPath(const QString& name,
+                      std::function<void(const QDBusPendingReply<>,
+                                         const QDBusObjectPath&)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -281,10 +307,10 @@ Manager::loadUnitPath(const QString &name,
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QDBusObjectPath> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
@@ -292,7 +318,9 @@ Manager::loadUnitPath(const QString &name,
     return call;
 }
 
-QDBusPendingCall Manager::reload() {
+QDBusPendingCall
+Manager::reload()
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -305,11 +333,11 @@ QDBusPendingCall Manager::reload() {
 }
 
 QDBusPendingCall
-Manager::reloadUnit(
-        const QString &name,
-        const QString &mode,
-        std::function<void(const QDBusPendingReply<> reply,
-                           const QDBusObjectPath &path)> callback) {
+Manager::reloadUnit(const QString& name,
+                    const QString& mode,
+                    std::function<void(const QDBusPendingReply<> reply,
+                                       const QDBusObjectPath& path)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -322,10 +350,10 @@ Manager::reloadUnit(
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QDBusObjectPath> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
@@ -334,11 +362,11 @@ Manager::reloadUnit(
 }
 
 QDBusPendingCall
-Manager::restartUnit(
-        const QString &name,
-        const QString &mode,
-        std::function<void(const QDBusPendingReply<> reply,
-                           const QDBusObjectPath &path)> callback) {
+Manager::restartUnit(const QString& name,
+                     const QString& mode,
+                     std::function<void(const QDBusPendingReply<> reply,
+                                        const QDBusObjectPath& path)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -350,24 +378,23 @@ Manager::restartUnit(
     if (!callback) {
         return call;
     }
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QDBusObjectPath> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
             });
     return call;
-
 }
 
 QDBusPendingCall
-Manager::startUnit(
-        const QString &name,
-        const QString &mode,
-        std::function<void(const QDBusPendingReply<> reply,
-                           const QDBusObjectPath &path)> callback) {
+Manager::startUnit(const QString& name,
+                   const QString& mode,
+                   std::function<void(const QDBusPendingReply<> reply,
+                                      const QDBusObjectPath& path)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -380,10 +407,10 @@ Manager::startUnit(
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QDBusObjectPath> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
@@ -392,11 +419,11 @@ Manager::startUnit(
 }
 
 QDBusPendingCall
-Manager::stopUnit(
-        const QString &name,
-        const QString &mode,
-        std::function<void(const QDBusPendingReply<> reply,
-                           const QDBusObjectPath &path)> callback) {
+Manager::stopUnit(const QString& name,
+                  const QString& mode,
+                  std::function<void(const QDBusPendingReply<> reply,
+                                     const QDBusObjectPath& path)> callback)
+{
     Q_D(Manager);
 
     if (!d->iface.isValid()) {
@@ -409,10 +436,10 @@ Manager::stopUnit(
         return call;
     }
 
-    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
-            [callback](QDBusPendingCallWatcher *watcher) {
+            [callback](QDBusPendingCallWatcher* watcher) {
                 QDBusPendingReply<QDBusObjectPath> reply = *watcher;
                 callback(reply, reply.value());
                 watcher->deleteLater();
@@ -420,9 +447,23 @@ Manager::stopUnit(
     return call;
 }
 
+QDBusPendingCall
+Manager::subscribe()
+{
+    Q_D(Manager);
+
+    if (!d->iface.isValid()) {
+        Q_ASSERT(d->iface.isValid());
+        return QDBusPendingCall::fromError(d->iface.lastError());
+    }
+
+    QDBusPendingCall call = d->iface.asyncCall("Subscribe");
+    return call;
+}
+
 QString
-Manager::version() const {
+Manager::version() const
+{
     Q_D(const Manager);
     return d_ptr->iface.property("Version").toString();
 }
-

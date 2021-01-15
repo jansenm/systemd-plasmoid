@@ -119,6 +119,8 @@ namespace Systemd {
                 std::function<void(const QDBusPendingReply<> reply,
                                    const QDBusObjectPath &path)> callback = nullptr);
 
+        QDBusPendingCall subscribe();
+
 
         QString version() const;
 
