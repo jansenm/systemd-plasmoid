@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 Michael Jansen <info@michael-jansen.biz>
+# SPDX-License-Identifier: CC0-1.0
+
 set(org_kde_systemd_qmlplugin_SRCS
         QmlPlugin.cpp
         UnitModel.cpp UnitModel.h

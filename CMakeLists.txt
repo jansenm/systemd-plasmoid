@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 Michael Jansen <info@michael-jansen.biz>
+# SPDX-License-Identifier: CC0-1.0
+
 cmake_minimum_required(VERSION 3.10)
 project(systemd_kde)
 

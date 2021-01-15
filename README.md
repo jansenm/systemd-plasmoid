@@ -45,4 +45,9 @@ And
 
 ## Licensing
 
-This work is licesed under the [»GNU Lesser General Public License v2.1 or later«](LICENSES/LGPL-2.1-or-later).
+    SPDX-FileCopyrightText: 2021 Michael Jansen <info@michael-jansen.biz>
+    SPDX-License-Identifier:  LGPL-2.1-or-later
+
+This work is licesed under the [»GNU Lesser General Public License v2.1 or later«](LICENSES/LGPL-2.1-or-later.txt).
+
+

@@ -1,6 +1,9 @@
+# SPDX-FileCopyrightText: 2021 Michael Jansen <info@michael-jansen.biz>
+# SPDX-License-Identifier: CC0-1.0
+
 ---
 # We'll use defaults from the LLVM style, but with 4 columns indentation.
-  # LLVM, Google, Chromium, Mozilla, WebKit, Microsoft
+# Options: LLVM, Google, Chromium, Mozilla, WebKit, Microsoft
 BasedOnStyle: Mozilla
 IndentWidth: 4
 ---

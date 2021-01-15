@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 Michael Jansen <info@michael-jansen.biz>
+# SPDX-License-Identifier: CC0-1.0
+
 add_library(systemd-qt SHARED
         debug.cpp debug.h
         Changes.cpp Changes.h Changes_p.h

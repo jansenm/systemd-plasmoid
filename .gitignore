@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 Michael Jansen <info@michael-jansen.biz>
+# SPDX-License-Identifier: CC0-1.0
+
 # CLion build directories
 cmake-build-*
 *.qmlc
