@@ -32,15 +32,15 @@ namespace Systemd {
         Q_PROPERTY(QString type
                            READ
                                    type
-                           CONSTANT);
+                           CONSTANT)
         Q_PROPERTY(QString linkName
                            READ
                                    linkName
-                           CONSTANT);
+                           CONSTANT)
         Q_PROPERTY(QString linkDestination
                            READ
                                    linkDestination
-                           CONSTANT);
+                           CONSTANT)
 
         class ChangesPrivate *d_ptr;
 
@@ -65,13 +65,13 @@ namespace Systemd {
         QString linkDestination() const;
 
     private:
-        Q_DECLARE_PRIVATE(Changes);
+        Q_DECLARE_PRIVATE(Changes)
     };
 
     typedef QList<Changes *> ChangesList;
 
 }
 
-Q_DECLARE_METATYPE(Systemd::ChangesList);
+Q_DECLARE_METATYPE(Systemd::ChangesList)
 
 #endif // SYSTEMD_KDE_CHANGES_H

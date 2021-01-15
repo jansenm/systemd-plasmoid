@@ -14,8 +14,8 @@ include(ECMAddTests)
 # KDE
 include(KDEInstallDirs)
 include(KDECMakeSettings)
-# This results in seriously inconvenient errors
-# include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
+include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
+# TODO Wonder if i also need this. Need to find out
 include(KDECompilerSettings NO_POLICY_SCOPE)
 
 find_package(Qt5
@@ -32,11 +32,6 @@ find_package(KF5 ${KF5_REQUIRED_VERSION}
         Notifications
         Plasma
         )
-
-# find_package(KF5 ${KF5_REQUIRED_VERSION}
-#         REQUIRED COMPONENTS
-#         Plasma
-#         I18n)
 
 add_subdirectory(lib/systemd)
 add_subdirectory(lib/qmlplugin)

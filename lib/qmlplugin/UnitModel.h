@@ -35,7 +35,7 @@ Q_OBJECT
                        WRITE
                                setUnits
                        NOTIFY
-                       unitsChanged);
+                       unitsChanged)
 
 public:
     explicit UnitModel(Systemd::Manager *manager, QObject *parent = nullptr);
@@ -67,18 +67,18 @@ public:
 
     QStringList units() const;
 
-signals:
+Q_SIGNALS:
 
     void unitsChanged() const;
 
 
-public slots:
+public Q_SLOTS:
 
     Q_INVOKABLE void addUnit(const QString &unitName);
 
     Q_INVOKABLE void removeUnit(const QString &unitName);
 
-private slots:
+private Q_SLOTS:
 
     void unitNew(const QString &unit, const QDBusObjectPath &path);
 
@@ -88,7 +88,7 @@ private slots:
 
     void unitFilesChanged();
 
-public slots:
+public Q_SLOTS:
     Q_INVOKABLE void enableUnitFiles(const QStringList &units, bool runtime, bool replace);
 
     Q_INVOKABLE void disableUnitFiles(const QStringList &units, bool runtime);
@@ -109,7 +109,7 @@ private:
 
     class UnitModelPrivate *d_ptr;
 
-    Q_DECLARE_PRIVATE(UnitModel);
+    Q_DECLARE_PRIVATE(UnitModel)
 };
 
 #endif // SYSTEMD_KDE_UNITMODEL_H

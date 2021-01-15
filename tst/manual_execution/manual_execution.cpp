@@ -31,7 +31,7 @@ class SystemDTest : public QObject
 {
     Q_OBJECT
 
-  private slots:
+  private Q_SLOTS:
 
     void testGetUnits()
     {
@@ -91,7 +91,7 @@ class SystemDTest : public QObject
         Manager m(bus, nullptr);
         bool gotSignal = false;
         auto call = m.getUnitFileState(
-                "-.mount",
+                QLatin1String("-.mount"),
                 [this, &gotSignal](QDBusPendingReply<> reply,
                                    QString state) -> void {
                     gotSignal = true;
@@ -115,7 +115,7 @@ class SystemDTest : public QObject
         Manager m(bus, nullptr);
         bool gotSignal = false;
         auto call = m.getUnitFileState(
-                "dddd.mount",
+                QLatin1String("dddd.mount"),
                 [this, &gotSignal](QDBusPendingReply<> reply,
                                    QString state) -> void {
                     gotSignal = true;
@@ -141,7 +141,7 @@ class SystemDTest : public QObject
 
         bool gotSignal = false;
         auto call = m.getUnitPath(
-          "-.mount",
+          QLatin1String("-.mount"),
           [&gotSignal](QDBusPendingReply<> reply,
                        const QDBusObjectPath& path) -> void {
               gotSignal = true;
@@ -168,7 +168,7 @@ class SystemDTest : public QObject
 
         bool gotSignal = false;
         auto call = m.getUnitPath(
-          "doesnotexist.mount",
+          QLatin1String("doesnotexist.mount"),
           [&gotSignal](QDBusPendingReply<> reply, QDBusObjectPath) -> void {
               gotSignal = true;
               QVERIFY(!reply.isValid());

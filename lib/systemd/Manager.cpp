@@ -32,8 +32,8 @@ struct Systemd::ManagerPrivate
 {
     ManagerPrivate(const QDBusConnection& bus, QObject* parent)
       : iface(QLatin1String("org.freedesktop.systemd1"),
-              "/org/freedesktop/systemd1",
-              "org.freedesktop.systemd1.Manager",
+              QLatin1String("/org/freedesktop/systemd1"),
+              QLatin1String("org.freedesktop.systemd1.Manager"),
               bus,
               parent)
     {
@@ -100,10 +100,11 @@ Manager::enableUnitFiles(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusMessage message = QDBusMessage::createMethodCall(d->iface.service(),
-                                                          d->iface.path(),
-                                                          d->iface.interface(),
-                                                          "EnableUnitFiles");
+    QDBusMessage message =
+      QDBusMessage::createMethodCall(d->iface.service(),
+                                     d->iface.path(),
+                                     d->iface.interface(),
+                                     QLatin1String("EnableUnitFiles"));
     message.setArguments(QVariantList({ unitFiles, runtimeOnly, replace }));
     // TODO: Why is it needed here but not used for start/stop/reload?
     message.setInteractiveAuthorizationAllowed(true);
@@ -146,10 +147,11 @@ Manager::disableUnitFiles(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusMessage message = QDBusMessage::createMethodCall(d->iface.service(),
-                                                          d->iface.path(),
-                                                          d->iface.interface(),
-                                                          "DisableUnitFiles");
+    QDBusMessage message =
+      QDBusMessage::createMethodCall(d->iface.service(),
+                                     d->iface.path(),
+                                     d->iface.interface(),
+                                     QLatin1String("DisableUnitFiles"));
     message.setArguments(QVariantList({ unitFiles, runtimeOnly }));
     // TODO: Why is it needed here but not used for start/stop/reload?
     message.setInteractiveAuthorizationAllowed(true);
@@ -186,7 +188,8 @@ Manager::getUnitFileState(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("GetUnitFileState", name);
+    QDBusPendingCall call =
+      d->iface.asyncCall(QLatin1String("GetUnitFileState"), name);
     if (!callback) {
         return call;
     }
@@ -214,7 +217,7 @@ Manager::getUnitPath(const QString& name,
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("GetUnit", name);
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("GetUnit"), name);
     if (!callback) {
         return call;
     }
@@ -242,7 +245,7 @@ Manager::listUnits(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("ListUnits");
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("ListUnits"));
     auto* watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher,
             &QDBusPendingCallWatcher::finished,
@@ -270,7 +273,7 @@ Manager::listUnitFiles(
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("ListUnitFiles");
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("ListUnitFiles"));
     if (!callback) {
         return call;
     }
@@ -302,7 +305,7 @@ Manager::loadUnitPath(const QString& name,
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("LoadUnit", name);
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("LoadUnit"), name);
     if (!callback) {
         return call;
     }
@@ -328,7 +331,7 @@ Manager::reload()
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("Reload");
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("Reload"));
     return call;
 }
 
@@ -345,7 +348,8 @@ Manager::reloadUnit(const QString& name,
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("ReloadUnit", name, mode);
+    QDBusPendingCall call =
+      d->iface.asyncCall(QLatin1String("ReloadUnit"), name, mode);
     if (!callback) {
         return call;
     }
@@ -374,7 +378,8 @@ Manager::restartUnit(const QString& name,
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("RestartUnit", name, mode);
+    QDBusPendingCall call =
+      d->iface.asyncCall(QLatin1String("RestartUnit"), name, mode);
     if (!callback) {
         return call;
     }
@@ -402,7 +407,8 @@ Manager::startUnit(const QString& name,
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("StartUnit", name, mode);
+    QDBusPendingCall call =
+      d->iface.asyncCall(QLatin1String("StartUnit"), name, mode);
     if (!callback) {
         return call;
     }
@@ -431,7 +437,8 @@ Manager::stopUnit(const QString& name,
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("StopUnit", name, mode);
+    QDBusPendingCall call =
+      d->iface.asyncCall(QLatin1String("StopUnit"), name, mode);
     if (!callback) {
         return call;
     }
@@ -457,7 +464,7 @@ Manager::subscribe()
         return QDBusPendingCall::fromError(d->iface.lastError());
     }
 
-    QDBusPendingCall call = d->iface.asyncCall("Subscribe");
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("Subscribe"));
     return call;
 }
 

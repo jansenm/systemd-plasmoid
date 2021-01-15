@@ -31,7 +31,7 @@ namespace Systemd {
     Q_OBJECT
         Q_PROPERTY(QString id
                            READ
-                           id);
+                           id)
 
         class UnitInfoPrivate *d_ptr;
 
@@ -78,13 +78,13 @@ namespace Systemd {
         QString id() const;
 
     private:
-        Q_DECLARE_PRIVATE(UnitInfo);
+        Q_DECLARE_PRIVATE(UnitInfo)
     };
 
     typedef QList<UnitInfo *> UnitInfoList;
 
 }
 
-Q_DECLARE_METATYPE(Systemd::UnitInfoList);
+Q_DECLARE_METATYPE(Systemd::UnitInfoList)
 
 #endif // SYSTEMD_KDE_UNITINFO_H

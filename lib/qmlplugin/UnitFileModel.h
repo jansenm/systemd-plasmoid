@@ -50,14 +50,14 @@ public:
     Q_INVOKABLE bool has(const QString & service) const;
 
 
-public slots:
+public Q_SLOTS:
 
     void unitFilesChanged();
 
 private:
 
     class UnitFileModelPrivate *d_ptr;
-    Q_DECLARE_PRIVATE(UnitFileModel);
+    Q_DECLARE_PRIVATE(UnitFileModel)
 };
 
 

@@ -43,8 +43,8 @@ namespace Systemd {
 
 }
 
-Q_DECLARE_METATYPE(Systemd::ChangesPrivate);
+Q_DECLARE_METATYPE(Systemd::ChangesPrivate)
 
-Q_DECLARE_METATYPE(Systemd::ChangesPrivateList);
+Q_DECLARE_METATYPE(Systemd::ChangesPrivateList)
 
 #endif // SYSTEMD_KDE_CHANGES_P_H

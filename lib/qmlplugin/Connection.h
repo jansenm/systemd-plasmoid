@@ -44,17 +44,17 @@ Q_OBJECT
                        READ
                                units
                        NOTIFY
-                       unitsChanged);
+                       unitsChanged)
 
     Q_PROPERTY(QAbstractItemModel *unitFiles
                        READ
                                unitFiles
                        NOTIFY
-                       unitFilesChanged);
+                       unitFilesChanged)
 
     Q_PROPERTY(Systemd::Manager *manager
                        READ
-                              manager);
+                              manager)
 
 public:
 
@@ -62,7 +62,7 @@ public:
         SessionBus,
         SystemBus
     };
-    Q_ENUM(Type);
+    Q_ENUM(Type)
 
     explicit Connection(QObject *parent = nullptr);
 
@@ -80,7 +80,7 @@ public:
 
 
 
-signals:
+Q_SIGNALS:
 
     void connectionChanged() const;
     void unitsChanged() const;

@@ -52,8 +52,8 @@ namespace Systemd {
 
 }
 
-Q_DECLARE_METATYPE(Systemd::UnitInfoPrivate);
+Q_DECLARE_METATYPE(Systemd::UnitInfoPrivate)
 
-Q_DECLARE_METATYPE(Systemd::UnitInfoPrivateList);
+Q_DECLARE_METATYPE(Systemd::UnitInfoPrivateList)
 
 #endif // SYSTEMD_KDE_UNITINFO_P_H

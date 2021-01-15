@@ -29,9 +29,9 @@ namespace Systemd {
 class SYSTEMD_QT_EXPORT UnitFile : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString id READ id);
-    Q_PROPERTY(QString name READ name);
-    Q_PROPERTY(QString state READ state);
+    Q_PROPERTY(QString id READ id)
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString state READ state)
 
     class UnitFilePrivate* d_ptr;
 
@@ -58,13 +58,13 @@ class SYSTEMD_QT_EXPORT UnitFile : public QObject
     QString state() const;
 
   private:
-    Q_DECLARE_PRIVATE(UnitFile);
+    Q_DECLARE_PRIVATE(UnitFile)
 };
 
 typedef QList<UnitFile*> UnitFileList;
 
 }
 
-Q_DECLARE_METATYPE(Systemd::UnitFileList);
+Q_DECLARE_METATYPE(Systemd::UnitFileList)
 
 #endif // SYSTEMD_KDE_UNITFILE_H

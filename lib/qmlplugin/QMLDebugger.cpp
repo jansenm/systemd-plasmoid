@@ -29,8 +29,8 @@ QString QMLDebugger::properties(QObject *item, bool linebreak)
     {
         QMetaProperty property = meta->property(i);
         const char* name = property.name();
-        QVariant value = item->property(name);
-        list[name] = value;
+        QVariant value = item->property(name).toString();
+        list[QLatin1String(name)] = value;
     }
 
     QString out;
@@ -39,11 +39,11 @@ QString QMLDebugger::properties(QObject *item, bool linebreak)
         i.next();
         if (!out.isEmpty())
         {
-            out += ", ";
-            if (linebreak) out += "\n";
+            out += QLatin1String(", ");
+            if (linebreak) out += QLatin1String("\n");
         }
         out.append(i.key());
-        out.append(": ");
+        out.append(QLatin1String(": "));
         out.append(i.value().toString());
     }
     return out;

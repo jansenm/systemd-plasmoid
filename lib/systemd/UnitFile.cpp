@@ -68,7 +68,7 @@ QString
 UnitFile::name() const
 {
     Q_D(const UnitFile);
-    return d->id.section('/', -1);
+    return d->id.section(QLatin1Char('/'), -1);
 }
 
 QString

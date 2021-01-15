@@ -29,5 +29,5 @@ QmlPlugin::registerTypes(const char* uri)
 {
     qmlRegisterType<Connection>(uri, 0, 1, "Connection");
     qmlRegisterType<QMLDebugger>(uri, 0, 1, "QMLDebugger");
-    qmlRegisterUncreatableType<UnitFileModel>(uri, 0, 1, "UnitFileModel", "enum");
+    qmlRegisterAnonymousType<UnitFileModel>(uri, 1);
 }

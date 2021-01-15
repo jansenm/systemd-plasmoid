@@ -24,116 +24,142 @@
 
 using namespace Systemd;
 
-struct Systemd::UnitPrivate {
-    UnitPrivate(const QDBusConnection &bus,
+struct Systemd::UnitPrivate
+{
+    UnitPrivate(const QDBusConnection& bus,
                 QDBusObjectPath path,
-                QObject *parent)
-            : unit_iface(QLatin1String("org.freedesktop.systemd1"),
-                         path.path(),
-                         "org.freedesktop.systemd1.Unit",
-                         bus,
-                         parent) {}
+                QObject* parent)
+      : unit_iface(QLatin1String("org.freedesktop.systemd1"),
+                   path.path(),
+                   QLatin1String("org.freedesktop.systemd1.Unit"),
+                   bus,
+                   parent)
+    {}
 
     QDBusInterface unit_iface;
 };
 
-Unit::Unit(const QDBusConnection &bus,
-           const QDBusObjectPath &path,
-           QObject *parent)
-        : QObject(parent), d_ptr(new UnitPrivate(bus, path, this)) {
+Unit::Unit(const QDBusConnection& bus,
+           const QDBusObjectPath& path,
+           QObject* parent)
+  : QObject(parent)
+  , d_ptr(new UnitPrivate(bus, path, this))
+{
     Q_D(Unit);
 
-    d->unit_iface.connection().connect("org.freedesktop.systemd1", path.path(), "org.freedesktop.DBus.Properties",
-                                       "PropertiesChanged", this,
-                                       SLOT(propertiesChanged(QString, QVariantMap, QStringList)));
+    d->unit_iface.connection().connect(
+      QLatin1String("org.freedesktop.systemd1"),
+      path.path(),
+      QLatin1String("org.freedesktop.DBus.Properties"),
+      QLatin1String("PropertiesChanged"),
+      this,
+      SLOT(propertiesChanged(QString, QVariantMap, QStringList)));
 }
 
-Unit::~Unit() {
+Unit::~Unit()
+{
     delete d_ptr;
 }
 
 QString
-Unit::activeState() const {
+Unit::activeState() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("ActiveState").toString();
 }
 
-bool Unit::canIsolate() const {
+bool
+Unit::canIsolate() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("CanIsolate").toBool();
 }
 
-bool Unit::canReload() const {
+bool
+Unit::canReload() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("CanReload").toBool();
 }
 
-bool Unit::canStart() const {
+bool
+Unit::canStart() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("CanStart").toBool();
 }
 
-bool Unit::canStop() const {
+bool
+Unit::canStop() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("CanStop").toBool();
 }
 
 QString
-Unit::description() const {
+Unit::description() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("Description").toString();
 }
 
 QString
-Unit::fragmentPath() const {
+Unit::fragmentPath() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("FragmentPath").toString();
 }
 
 QString
-Unit::id() const {
+Unit::id() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("Id").toString();
 }
 
 bool
-Unit::isValid() const {
+Unit::isValid() const
+{
     Q_D(const Unit);
     return d->unit_iface.isValid();
 }
 
 QString
-Unit::loadState() const {
+Unit::loadState() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("LoadState").toString();
 }
 
 QStringList
-Unit::names() const {
+Unit::names() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("Names").toStringList();
 }
 
-
 void
-Unit::propertiesChanged(const QString &interface, const QVariantMap changed, QStringList invalid) {
+Unit::propertiesChanged(const QString& interface,
+                        const QVariantMap changed,
+                        QStringList invalid)
+{
     // TODO : handle invalid
     Q_UNUSED(interface);
     Q_UNUSED(invalid);
 
     QVariantMap::const_iterator it = changed.begin();
     while (it != changed.end()) {
-        if (it.key() == "activeState") {
+        if (it.key() == QLatin1String("activeState")) {
             emit activeStateChanged(it.value().toString());
-        } else if (it.key() == "result") {
+        } else if (it.key() == QLatin1String("result")) {
             emit resultChanged(it.value().toString());
-        } else if (it.key() == "statusErrno") {
+        } else if (it.key() == QLatin1String("statusErrno")) {
             emit statusErrnoChanged(it.value().toInt());
-        } else if (it.key() == "statusText") {
+        } else if (it.key() == QLatin1String("statusText")) {
             emit statusTextChanged(it.value().toString());
-        } else if (it.key() == "subState") {
+        } else if (it.key() == QLatin1String("subState")) {
             emit subStateChanged(it.value().toString());
-        } else if (it.key() == "subState") {
+        } else if (it.key() == QLatin1String("subState")) {
             emit subStateChanged(it.value().toString());
         }
         // TODO What about the rest
@@ -144,13 +170,15 @@ Unit::propertiesChanged(const QString &interface, const QVariantMap changed, QSt
 }
 
 QString
-Unit::subState() const {
+Unit::subState() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("SubState").toString();
 }
 
 QString
-Unit::unitFileState() const {
+Unit::unitFileState() const
+{
     Q_D(const Unit);
     return d->unit_iface.property("UnitFileState").toString();
 }

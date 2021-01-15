@@ -124,7 +124,7 @@ namespace Systemd {
 
         QString version() const;
 
-    signals:
+    Q_SIGNALS:
 
         void unitNew(const QString &unit, const QDBusObjectPath &path) const;
 

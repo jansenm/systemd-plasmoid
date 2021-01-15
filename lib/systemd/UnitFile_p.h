@@ -42,7 +42,7 @@ operator>>(const QDBusArgument& argument, UnitFilePrivate& unit);
 
 }
 
-Q_DECLARE_METATYPE(Systemd::UnitFilePrivate);
-Q_DECLARE_METATYPE(Systemd::UnitFilePrivateList);
+Q_DECLARE_METATYPE(Systemd::UnitFilePrivate)
+Q_DECLARE_METATYPE(Systemd::UnitFilePrivateList)
 
 #endif // SYSTEMD_KDE_UNITFILE_P_H

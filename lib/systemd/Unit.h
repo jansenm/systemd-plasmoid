@@ -42,64 +42,64 @@ namespace Systemd {
         Q_PROPERTY(QString id
                            READ
                                    id
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(QString activeState
                            READ
                                    activeState
                            NOTIFY
-                           activeStateChanged);
+                           activeStateChanged)
 
         Q_PROPERTY(bool canIsolate
                            READ
                                    canIsolate
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(bool canReload
                            READ
                                    canReload
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(bool canStart
                            READ
                                    canStart
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(bool canStop
                            READ
                                    canStop
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(QString description
                            READ
                                    description
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(QString fragmentPath
                            READ
                                    fragmentPath
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(QString loadState
                            READ
                                    loadState
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(QStringList names
                            READ
                                    names
-                           CONSTANT);
+                           CONSTANT)
 
         Q_PROPERTY(QString subState
                            READ
                                    subState
                            NOTIFY
-                           subStateChanged);
+                           subStateChanged)
 
         Q_PROPERTY(QString unitFileState
                            READ
                                    unitFileState
-                           CONSTANT);
+                           CONSTANT)
 
         struct UnitPrivate *d_ptr;
 
@@ -232,7 +232,7 @@ namespace Systemd {
          */
         QString unitFileState() const;
 
-    signals:
+    Q_SIGNALS:
 
         void activeStateChanged(const QString &newActiveState) const;
 
@@ -246,19 +246,19 @@ namespace Systemd {
 
         void changed(const Unit &unit) const;
 
-    private slots:
+    private Q_SLOTS:
 
         void propertiesChanged(const QString &interface, const QMap<QString, QVariant> changed, QStringList invalid);
 
 
     private:
-        Q_DECLARE_PRIVATE(Unit);
+        Q_DECLARE_PRIVATE(Unit)
     };
 
     typedef QList<Unit *> UnitList;
 
 }
 
-Q_DECLARE_METATYPE(Systemd::UnitList);
+Q_DECLARE_METATYPE(Systemd::UnitList)
 
 #endif // SYSTEMD_KDE_UNIT_H
