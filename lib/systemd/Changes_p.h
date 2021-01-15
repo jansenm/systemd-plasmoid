@@ -45,8 +45,11 @@ namespace Systemd {
 
 }
 
+
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::ChangesPrivate)
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::ChangesPrivateList)
 
 #endif // SYSTEMD_KDE_CHANGES_P_H

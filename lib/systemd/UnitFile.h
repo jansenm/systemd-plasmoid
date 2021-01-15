@@ -48,7 +48,7 @@ class SYSTEMD_QT_EXPORT UnitFile : public QObject
      *
      * @endinternal
      */
-    UnitFile(const UnitFilePrivate& p, QObject* parent = nullptr);
+    explicit UnitFile(const UnitFilePrivate& p, QObject* parent = nullptr);
 
     /**
      * Destroy the unit object.
@@ -67,6 +67,7 @@ typedef QList<UnitFile*> UnitFileList;
 
 }
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::UnitFileList)
 
 #endif // SYSTEMD_KDE_UNITFILE_H

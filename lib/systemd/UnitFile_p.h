@@ -44,7 +44,9 @@ operator>>(const QDBusArgument& argument, UnitFilePrivate& unit);
 
 }
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::UnitFilePrivate)
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::UnitFilePrivateList)
 
 #endif // SYSTEMD_KDE_UNITFILE_P_H

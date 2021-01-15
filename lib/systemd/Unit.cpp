@@ -161,8 +161,6 @@ Unit::propertiesChanged(const QString& interface,
             emit statusTextChanged(it.value().toString());
         } else if (it.key() == QLatin1String("subState")) {
             emit subStateChanged(it.value().toString());
-        } else if (it.key() == QLatin1String("subState")) {
-            emit subStateChanged(it.value().toString());
         }
         // TODO What about the rest
         ++it;

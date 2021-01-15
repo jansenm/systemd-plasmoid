@@ -30,8 +30,6 @@
 namespace Systemd {
 
     struct UnitInfoPrivate {
-        QString unit_file_status;
-        QString unit_file;
         QString job_type;
         QString following;
         QString sub_state;
@@ -54,8 +52,10 @@ namespace Systemd {
 
 }
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::UnitInfoPrivate)
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::UnitInfoPrivateList)
 
 #endif // SYSTEMD_KDE_UNITINFO_P_H

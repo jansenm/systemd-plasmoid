@@ -35,7 +35,7 @@ class QmlPlugin : public QQmlExtensionPlugin
       : QQmlExtensionPlugin(parent)
     {}
 
-    ~QmlPlugin(){};
+    ~QmlPlugin() override = default;
 
     void registerTypes(const char* uri) override;
 };

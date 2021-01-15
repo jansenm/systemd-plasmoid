@@ -87,6 +87,7 @@ namespace Systemd {
 
 }
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::UnitInfoList)
 
 #endif // SYSTEMD_KDE_UNITINFO_H

@@ -53,7 +53,7 @@ namespace Systemd {
          * @param reply         The dbus reply object to initialize from
          * @param parent        The parent object or nullptr
          */
-        Changes(const ChangesPrivate &p, QObject *parent = nullptr);
+        explicit Changes(const ChangesPrivate &p, QObject *parent = nullptr);
 
         /**
          * Destroy the unit object.
@@ -74,6 +74,7 @@ namespace Systemd {
 
 }
 
+// NOLINTNEXTLINE
 Q_DECLARE_METATYPE(Systemd::ChangesList)
 
 #endif // SYSTEMD_KDE_CHANGES_H
