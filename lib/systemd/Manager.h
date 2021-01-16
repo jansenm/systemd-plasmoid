@@ -123,6 +123,7 @@ namespace Systemd {
 
         QDBusPendingCall subscribe();
 
+        QDBusPendingCall unsubscribe();
 
         QString version() const;
 

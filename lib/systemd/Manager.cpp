@@ -74,6 +74,8 @@ Manager::Manager(QDBusConnection bus, QObject* parent)
 
 Manager::~Manager()
 {
+    unsubscribe();
+
     delete d_ptr;
 }
 
@@ -467,6 +469,20 @@ Manager::subscribe()
     }
 
     QDBusPendingCall call = d->iface.asyncCall(QLatin1String("Subscribe"));
+    return call;
+}
+
+QDBusPendingCall
+Manager::unsubscribe()
+{
+    Q_D(Manager);
+
+    if (!d->iface.isValid()) {
+        Q_ASSERT(d->iface.isValid());
+        return QDBusPendingCall::fromError(d->iface.lastError());
+    }
+
+    QDBusPendingCall call = d->iface.asyncCall(QLatin1String("Unsubscribe"));
     return call;
 }
 
