@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 project(systemd_kde
         DESCRIPTION "A plasma widget to control systemd units"
         HOMEPAGE_URL "https://github.com/jansenm/systemd-plasmoid"
-        VERSION 2.0.0)
+        VERSION 2.0.1)
 
 find_package(ECM REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
